@@ -1,6 +1,7 @@
 body {
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  /* text-align: center; */
 }
 
 a {
@@ -12,13 +13,15 @@ a {
   font-size: larger;
 }
 
-#matches, #scores {
+#matches,
+#scores {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
 }
 
-#matches section, #scores section {
+#matches section,
+#scores section {
   background-color: crimson;
   color: white;
   margin: 5px;
@@ -43,4 +46,3 @@ button.game {
   text-align: center;
   font-weight: bold;
 }
-
