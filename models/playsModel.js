@@ -92,6 +92,105 @@ class Play {
             return { status: 500, result: err };
         }
     }
+
+    static async getUserBoardInfo(userId, gameId) {
+        let [[playerInfo]] = await pool.query(`
+        select ug_gold as "gold", ug_mine_level as "mineLevel"
+        from user_game
+        where ug_game_id = ? and ug_user_id = ?`,
+            [gameId, userId]);
+
+        [playerInfo.hand] = await pool.query(`select * from user_game_card where ugc_state_id = 1`);
+
+        [playerInfo.zone] = await pool.query(`select * from user_game_card where ugc_state_id = 2`);
+        
+        [playerInfo.discard] = await pool.query(`select * from user_game_card where ugc_state_id = 3`);
+
+
+        return playerInfo
+    }
+
+    static async getBoard(game) {
+        try {
+            let board = {};
+            board.player = await Play.getUserBoardInfo(game.player.id, game.id);
+
+            board.opponents = [];
+
+            for (let i = 0; i < game.opponents.length; i++) {
+                const element = game.opponents[i];
+                board.opponents[i] = await Play.getUserBoardInfo(game.opponents[i].id, game.id);
+            }
+            console.log(board);
+            return { status: 200, result: board};
+           
+        } catch (err) {
+            console.log(err);
+            return { status: 500, result: err };
+        }
+    }
+
+    static async drawCard(game, rarity) {
+        try {
+            if (game.player.state.name != "Playing") {
+                return {status: 400, result:{msg: 
+                    "You cannot end turn since you are not currently on your turn"}}
+            }
+            else {
+                // Draw a card
+                let [cards] = await pool.query(
+                    `select crd_name as "name" and crd_id as "id" from card where crd_rarity = ?`,
+                        [rarity]);
+                let randomCard = cards[Math.floor(Math.random()*cards.length)];
+                
+                let [result] = await pool.query(
+                    `Insert into user_game_card (ugc_user_game_id, ugc_crd_id, ugc_state_id) values (?, ?, 1)`,
+                        [game.player.id, randomCard.id]);
+
+            }
+            return { status: 200, result: { msg: "You drew a card." } };
+        } catch (err) {
+            console.log(err);
+            return { status: 500, result: err };
+        } 
+    }
+
+    // static async #generatePlayerDeck(playerID) {
+    //     // Gets the 3 base decks (divided by rarity)
+    //     let [baseDecks] = await pool.query(`Select * from deck`);
+    //     console.log("Base Decks");
+    //     console.log(baseDecks);
+
+    //     // Makes a copy of the template deck onto user game deck
+    //     for (let i = 0; i < baseDecks.length; i++) {
+    //         await pool.query(`Insert into user_game_deck(ugd_user_game_id, ugd_rar_id) values (?, ?)`, [playerID, baseDecks[i].dec_rarity_id]);
+    //     }
+
+    //     // Get the template cards from the database
+    //     let [baseCards] = await pool.query(`Select crd_id as "card_id", dhc_dec_id as "deck_id" from card, deck_has_card where crd_id = dhc_crd_id`);
+    //     // Get the user game decks that were made
+    //     let [userGameDecks] = await pool.query(`Select ugd_id as "deck_id", ugd_rar_id as "rarity" from user_game_deck where ugd_user_game_id = ? order by ugd_id`, [playerID]);
+
+    //     console.log("User Game Decks");
+    //     console.log(userGameDecks);
+
+    //     // For every template card
+    //     for (let i = 0; i < baseCards.length; i++) {
+
+    //         // Add a new user game card
+    //         // State is hard coded in (1 is "Deck")
+    //         await pool.query(`Insert into user_game_card(ugc_crd_id, ugc_user_game_id, ugc_state_id) values (?, ?, ?)`, [baseCards[i].card_id, playerID, 1]);
+            
+    //         // Selects the last card we added
+    //         let [[userGameCardID]] = await pool.query(`Select max(ugc_id) as "max_id" from user_game_card where ugc_user_game_id = ?`, [playerID]);
+
+    //         // Inserts it into the right deck
+    //         // console.log("userGameDecks[baseCards[i] .rarity].id: ");
+    //         console.log(userGameDecks[baseCards[i].rarity].ID);
+    //         await pool.query(`Insert into user_game_deck_cards(udc_ugc_id, udc_ugd_id) values (?, ?)`, [userGameCardID.max_id, userGameDecks[baseCards[i]].rarity.id]);
+            
+    //     }
+    //}
 }
 
 module.exports = Play;
