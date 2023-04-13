@@ -11,7 +11,6 @@ class Play {
     // Just a to have a way to determine end of game
     static maxNumberTurns = 10;
 
-
     // we consider all verifications were made
     static async startGame(game) {
         try {
@@ -34,7 +33,6 @@ class Play {
             return { status: 500, result: err };
         }
     }
-
 
     // This considers that only one player plays at each moment, 
     // so ending my turn starts the other players turn
@@ -83,8 +81,8 @@ class Play {
             // Insert score lines with the state and points.
             // For this template both are  tied (id = 1) and with one point 
             let sqlScore = `Insert into scoreboard (sb_user_game_id,sb_state_id,sb_points) values (?,?,?)`;
-            await pool.query(sqlScore, [game.player.id,1,1]);
-            await pool.query(sqlScore, [game.opponents[0].id,1,1]);
+            await pool.query(sqlScore, [game.player.id, 1, 1]);
+            await pool.query(sqlScore, [game.opponents[0].id, 1, 1]);
 
             return { status: 200, result: { msg: "Game ended. Check scores." } };
         } catch (err) {
@@ -103,7 +101,7 @@ class Play {
         [playerInfo.hand] = await pool.query(`select * from user_game_card where ugc_state_id = 1`);
 
         [playerInfo.zone] = await pool.query(`select * from user_game_card where ugc_state_id = 2`);
-        
+
         [playerInfo.discard] = await pool.query(`select * from user_game_card where ugc_state_id = 3`);
 
 
@@ -122,8 +120,8 @@ class Play {
                 board.opponents[i] = await Play.getUserBoardInfo(game.opponents[i].id, game.id);
             }
             console.log(board);
-            return { status: 200, result: board};
-           
+            return { status: 200, result: board };
+
         } catch (err) {
             console.log(err);
             return { status: 500, result: err };
@@ -133,26 +131,30 @@ class Play {
     static async drawCard(game, rarity) {
         try {
             if (game.player.state.name != "Playing") {
-                return {status: 400, result:{msg: 
-                    "You cannot end turn since you are not currently on your turn"}}
+                return {
+                    status: 400, result: {
+                        msg:
+                            "You cannot end turn since you are not currently on your turn"
+                    }
+                }
             }
             else {
                 // Draw a card
                 let [cards] = await pool.query(
                     `select crd_name as "name" and crd_id as "id" from card where crd_rarity = ?`,
-                        [rarity]);
-                let randomCard = cards[Math.floor(Math.random()*cards.length)];
-                
+                    [rarity]);
+                let randomCard = cards[Math.floor(Math.random() * cards.length)];
+
                 let [result] = await pool.query(
                     `Insert into user_game_card (ugc_user_game_id, ugc_crd_id, ugc_state_id) values (?, ?, 1)`,
-                        [game.player.id, randomCard.id]);
+                    [game.player.id, randomCard.id]);
 
             }
             return { status: 200, result: { msg: "You drew a card." } };
         } catch (err) {
             console.log(err);
             return { status: 500, result: err };
-        } 
+        }
     }
 
     // static async #generatePlayerDeck(playerID) {
@@ -180,7 +182,7 @@ class Play {
     //         // Add a new user game card
     //         // State is hard coded in (1 is "Deck")
     //         await pool.query(`Insert into user_game_card(ugc_crd_id, ugc_user_game_id, ugc_state_id) values (?, ?, ?)`, [baseCards[i].card_id, playerID, 1]);
-            
+
     //         // Selects the last card we added
     //         let [[userGameCardID]] = await pool.query(`Select max(ugc_id) as "max_id" from user_game_card where ugc_user_game_id = ?`, [playerID]);
 
@@ -188,7 +190,7 @@ class Play {
     //         // console.log("userGameDecks[baseCards[i] .rarity].id: ");
     //         console.log(userGameDecks[baseCards[i].rarity].ID);
     //         await pool.query(`Insert into user_game_deck_cards(udc_ugc_id, udc_ugd_id) values (?, ?)`, [userGameCardID.max_id, userGameDecks[baseCards[i]].rarity.id]);
-            
+
     //     }
     //}
 }

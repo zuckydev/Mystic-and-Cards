@@ -1,37 +1,74 @@
 // Actions
-async function requestEndTurn() {
+async function requestBoardInfo() {
     try {
-        const response = await fetch(`/api/plays/endturn`, 
-        {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-          method: "PATCH"
-      });
-      return {successful: response.status == 200};
+        const response = await fetch(`/api/plays/`);
+        let result = await response.json();
+        return {
+            successful: response.status == 200,
+            unauthenticated: response.status == 401,
+            board: result
+        };
     } catch (err) {
         // Treat 500 errors here
         console.log(err);
-        return {err: err};
+        return { err: err };
+    }
+}
+
+async function requestDrawCard(deck) {
+    try {
+        const response = await fetch(`/api/plays/drawCard`,
+            {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                method: "PATCH",
+                body: JSON.stringify({
+                    deck: deck
+                })
+
+            });
+        return { successful: response.status == 200 };
+    } catch (err) {
+        // Treat 500 errors here
+        console.log(err);
+        return { err: err };
+    }
+}
+
+async function requestEndTurn() {
+    try {
+        const response = await fetch(`/api/plays/endturn`,
+            {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                method: "PATCH"
+            });
+        return { successful: response.status == 200 };
+    } catch (err) {
+        // Treat 500 errors here
+        console.log(err);
+        return { err: err };
     }
 }
 
 async function requestCloseScore() {
     try {
-        const response = await fetch(`/api/scores/auth/close`, 
-        {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-          method: "PATCH"
-      });
-      return {successful: response.status == 200};
+        const response = await fetch(`/api/scores/auth/close`,
+            {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                method: "PATCH"
+            });
+        return { successful: response.status == 200 };
     } catch (err) {
         // Treat 500 errors here
         console.log(err);
-        return {err: err};
+        return { err: err };
     }
 }
-
