@@ -1,8 +1,8 @@
 window.onload = async function () {
     try {
         let result = await checkAuthenticated(true);
-        if (result.err) {  throw result.err; }
-        document.getElementById('player').textContent = "Hello "+window.user.name;
+        if (result.err) { throw result.err; }
+        document.getElementById('player').textContent = "Hello " + window.user.name;
         result = await checkGame(true);
         if (result.err) throw result.err;
         result = await requestWaitingMatches();
@@ -11,7 +11,7 @@ window.onload = async function () {
         fillMatches(result.matches);
     } catch (err) {
         console.log(err);
-       // alert("Something went wrong!")
+        // alert("Something went wrong!")
     }
 }
 
@@ -39,7 +39,7 @@ async function join(mId) {
         window.location.pathname = "/game.html"
     } catch (err) {
         console.log(err);
-    //  alert("Something is not working");
+        //  alert("Something is not working");
     }
 }
 
@@ -56,9 +56,10 @@ async function refresh() {
         fillMatches(result.matches);
     } catch (err) {
         console.log(err);
-       // alert("Something went wrong!")
+        // alert("Something went wrong!")
     }
 }
+
 async function createMatch() {
     try {
         let result = await requestCreateMatch();
@@ -67,10 +68,9 @@ async function createMatch() {
         window.location.pathname = "/waiting.html"
     } catch (err) {
         console.log(err);
-      //  alert("Something is not working");
+        //  alert("Something is not working");
     }
 }
-
 
 async function logout() {
     try {
@@ -80,6 +80,6 @@ async function logout() {
         window.location.pathname = "/index.html"
     } catch (err) {
         console.log(err);
-       // alert("Something is not working");
+        // alert("Something is not working");
     }
 }

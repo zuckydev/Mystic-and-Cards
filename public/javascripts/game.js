@@ -1,6 +1,4 @@
-
-
-window.onload = async function() {
+window.onload = async function () {
     try {
         let result = await checkGame(true);
         if (result.err) throw result.err;
@@ -8,4 +6,3 @@ window.onload = async function() {
         console.log(err);
     }
 }
-

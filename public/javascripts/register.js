@@ -4,14 +4,14 @@ async function register() {
     try {
         let name = document.getElementById("name").value;
         let pass = document.getElementById("password").value;
-        let res = await requestRegister(name,pass);
+        let res = await requestRegister(name, pass);
         if (res.successful) {
             msgDOM.textContent = "Account created. Go to login page";
         } else {
             msgDOM.textContent = "Was not able to register";
-        }      
+        }
     } catch (err) {
         console.log(err);
-        msgDOM.textContent = "An error occurred";   
+        msgDOM.textContent = "An error occurred";
     }
 }
