@@ -22,14 +22,14 @@ const gamesRouter = require("./routes/gamesRoutes");
 const playsRouter = require("./routes/playsRoutes");
 const scoresRouter = require("./routes/scoresRoutes");
 
-app.use("/api/users",usersRouter);
-app.use("/api/games",gamesRouter);
-app.use("/api/plays",playsRouter);
-app.use("/api/scores",scoresRouter);
+app.use("/api/users", usersRouter);
+app.use("/api/games", gamesRouter);
+app.use("/api/plays", playsRouter);
+app.use("/api/scores", scoresRouter);
 
 // when we don't find anything
 app.use((req, res, next) => {
-  res.status(404).send({msg:"No resource or page found."});
+  res.status(404).send({ msg: "No resource or page found." });
 })
 
 // When we find an error (means it was not treated previously)
@@ -39,6 +39,6 @@ app.use((err, req, res, next) => {
 })
 
 const port = parseInt(process.env.port || '8080');
-app.listen(port,function() {
-  console.log("Server running at http://localhost:"+port);
+app.listen(port, function () {
+  console.log("Server running at http://localhost:" + port);
 });
