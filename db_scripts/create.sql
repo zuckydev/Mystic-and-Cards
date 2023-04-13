@@ -100,7 +100,7 @@ create table user_game_card (
     ugc_crd_id int not null,
     ugc_state_id int not null,
     ugc_user_game_id int not null,
-    ugc_position int not null,
+#   ugc_position int not null,
     primary key (ugc_id));
 
 # create table user_game_deck (

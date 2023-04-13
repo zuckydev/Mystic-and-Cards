@@ -128,35 +128,6 @@ class Play {
         }
     }
 
-    static async drawCard(game, rarity) {
-        try {
-            if (game.player.state.name != "Playing") {
-                return {
-                    status: 400, result: {
-                        msg:
-                            "You cannot end turn since you are not currently on your turn"
-                    }
-                }
-            }
-            else {
-                // Draw a card
-                let [cards] = await pool.query(
-                    `select crd_name as "name" and crd_id as "id" from card where crd_rarity = ?`,
-                    [rarity]);
-                let randomCard = cards[Math.floor(Math.random() * cards.length)];
-
-                let [result] = await pool.query(
-                    `Insert into user_game_card (ugc_user_game_id, ugc_crd_id, ugc_state_id) values (?, ?, 1)`,
-                    [game.player.id, randomCard.id]);
-
-            }
-            return { status: 200, result: { msg: "You drew a card." } };
-        } catch (err) {
-            console.log(err);
-            return { status: 500, result: err };
-        }
-    }
-
     // static async #generatePlayerDeck(playerID) {
     //     // Gets the 3 base decks (divided by rarity)
     //     let [baseDecks] = await pool.query(`Select * from deck`);

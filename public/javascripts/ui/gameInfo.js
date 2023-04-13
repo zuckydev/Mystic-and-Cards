@@ -10,6 +10,7 @@ class GameInfo {
     // data
     static game;
     static board;
+    static card;
     static images = {};
     static sounds = {};
 

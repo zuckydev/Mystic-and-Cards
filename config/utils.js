@@ -7,3 +7,7 @@ module.exports.genToken = function genToken(length) {
    return token;
 }
 
+module.exports.randomNumber = function randomNumber(maxN) {
+    let randomNumber = Math.floor(Math.random() * maxN);
+    return randomNumber;
+}

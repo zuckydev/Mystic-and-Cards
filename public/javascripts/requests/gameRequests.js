@@ -1,7 +1,7 @@
 // Actions
 async function requestBoardInfo() {
     try {
-        const response = await fetch(`/api/plays/`);
+        const response = await fetch(`/api/card/`);
         let result = await response.json();
         return {
             successful: response.status == 200,
@@ -17,13 +17,13 @@ async function requestBoardInfo() {
 
 async function requestDrawCard(deck) {
     try {
-        const response = await fetch(`/api/plays/drawCard`,
+        const response = await fetch(`/api/card/draw`,
             {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                method: "PATCH",
+                method: "POST",
                 body: JSON.stringify({
                     deck: deck
                 })
