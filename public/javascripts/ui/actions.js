@@ -1,4 +1,3 @@
-
 async function getGameInfo() {
     let result = await requestPlayerGame();
     if (!result.successful) {
@@ -6,21 +5,20 @@ async function getGameInfo() {
         window.location.pathname = "index.html";
     } else {
         GameInfo.game = result.game;
-        if (GameInfo.scoreBoard) GameInfo.scoreBoard.update(GameInfo.game); 
+        if (GameInfo.scoreBoard) GameInfo.scoreBoard.update(GameInfo.game);
         else GameInfo.scoreBoard = new ScoreBoard(GameInfo.game);
         // if game ended we get the scores and prepare the ScoreWindow
         if (GameInfo.game.state == "Finished") {
             let result = await requestScore();
-            GameInfo.scoreWindow = new ScoreWindow(50,50,GameInfo.width-100,GameInfo.height-100,result.score,closeScore);
+            GameInfo.scoreWindow = new ScoreWindow(50, 50, GameInfo.width - 100, GameInfo.height - 100, result.score, closeScore);
         }
     }
 }
 
-
 async function endturnAction() {
     let result = await requestEndTurn();
     if (result.successful) {
-        await  getGameInfo();
+        await getGameInfo();
         GameInfo.prepareUI();
     } else alert("Something went wrong when ending the turn.")
 }
@@ -30,4 +28,24 @@ async function closeScore() {
     if (result.successful) {
         await checkGame(true); // This should send the player back to matches
     } else alert("Something went wrong when ending the turn.")
+}
+
+async function getBoardInfo() {
+    let result = await requestBoardInfo();
+    if (!result.successful) {
+        alert("Something is wrong with the game please login again!");
+        window.location.pathname = "index.html";
+    } else {
+        GameInfo.board = result.board;
+        console.log(GameInfo.board);
+    }
+}
+
+async function drawCardAction(deck) {
+    let result = await requestDrawCard(deck);
+    if (result.successful) {
+        await getGameInfo();
+        await getBoardInfo();
+        GameInfo.prepareUI();
+    } else alert("Something went wrong when drawing a card.");
 }
