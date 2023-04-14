@@ -6,12 +6,11 @@ function fromDBCardToCard(dbCard) {
 }
 
 class Card {
-    constructor(cardId,deckId,name,type,active) {
+    constructor(cardId, deckId,name,type,active) {
         this.cardId = cardId;
         this.deckId = deckId;
         this.name = name;
-        this.type = type;
-        
+        this.type = type;    
     }
 
     static async drawCard(game, body) {
@@ -20,7 +19,7 @@ class Card {
                 return {
                     status: 400, result: {
                         msg:
-                            "You cannot end turn since you are not currently on your turn"
+                            "You cannot draw card since you are not currently on your turn."
                     }
                 }
             }
@@ -37,6 +36,26 @@ class Card {
 
             }
             return { status: 200, result: { msg: "You drew a card." } };
+        } catch (err) {
+            console.log(err);
+            return { status: 500, result: err };
+        }
+    }
+
+    static async playCard(cardID) {
+        try {
+            if (game.player.state.name != "Playing") {
+                return {
+                    status: 400, result: {
+                        msg:
+                            "You cannot draw card since you are not currently on your turn."
+                    }
+                }
+            }
+            else {
+                await pool.query(`Update user_game_card set ugc_state_id = 2 where ugc_crd_id = ?`, [cardID]);
+            }
+
         } catch (err) {
             console.log(err);
             return { status: 500, result: err };
@@ -92,10 +111,5 @@ class MatchDecks {
             }
     }
 }
-
-// to do: finish deck
-// draw and play card
-// mines
-// layout
 
 module.exports = Card;

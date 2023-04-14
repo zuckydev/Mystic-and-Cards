@@ -49,3 +49,15 @@ async function drawCardAction(deck) {
         GameInfo.prepareUI();
     } else alert("Something went wrong when drawing a card.");
 }
+
+async function drawCommonCard() {
+    drawCardAction(1);
+}
+
+async function drawEpicCard() {
+    drawCardAction(2);
+}
+
+async function drawLegendaryCard() {
+    drawCardAction(3);
+}

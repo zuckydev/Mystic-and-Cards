@@ -25,7 +25,7 @@ async function requestDrawCard(deck) {
                 },
                 method: "POST",
                 body: JSON.stringify({
-                    deck: deck
+                    rarity: deck
                 })
 
             });

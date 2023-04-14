@@ -31,11 +31,28 @@ async function setup() {
     GameInfo.endturnButton.parent('game');
     GameInfo.endturnButton.position(GameInfo.width - 150, GameInfo.height - 50);
     GameInfo.endturnButton.mousePressed(endturnAction);
-    GameInfo.endturnButton.addClass('game')
+    GameInfo.endturnButton.addClass('game');
 
+    GameInfo.endturnButton = createButton('Draw Common Card');
+    GameInfo.endturnButton.parent('game');
+    GameInfo.endturnButton.position(GameInfo.width / 2, GameInfo.height / 2);
+    GameInfo.endturnButton.mousePressed(drawCommonCard);
+    GameInfo.endturnButton.addClass('game');
 
+    GameInfo.endturnButton = createButton('Draw Epic Card');
+    GameInfo.endturnButton.parent('game');
+    GameInfo.endturnButton.position(GameInfo.width / 2, GameInfo.height / 2 + 50);
+    GameInfo.endturnButton.mousePressed(drawEpicCard);
+    GameInfo.endturnButton.addClass('game');
+
+    GameInfo.endturnButton = createButton('Draw Legendary Card');
+    GameInfo.endturnButton.parent('game');
+    GameInfo.endturnButton.position(GameInfo.width / 2, GameInfo.height / 2 + 100);
+    GameInfo.endturnButton.mousePressed(drawLegendaryCard);
+    GameInfo.endturnButton.addClass('game');
+
+    
     GameInfo.prepareUI();
-
 
     GameInfo.loading = false;
 }

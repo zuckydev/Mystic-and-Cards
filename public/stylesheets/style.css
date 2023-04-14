@@ -45,4 +45,5 @@ button.game {
   border-radius: 6px;
   text-align: center;
   font-weight: bold;
+  cursor: pointer;
 }
