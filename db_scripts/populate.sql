@@ -33,33 +33,37 @@ insert into user_game_card_state (ucs_state) values
 #    (2),
 #    (3);
 
-insert into card (crd_name, crd_rarity) values
-    ("Rat", 1),
-    ("Zombie", 1),
-    ("Rock", 1),
-    ("Spider", 1),
-    ("Skeleton", 1),
-    ("Kraken", 2),
-    ("Reaper", 2),
-    ("Golem", 2),
-    ("Hydra", 3),
-    ("Demon", 3),
+insert into card (crd_name, crd_rarity, crd_type_id) values
+    ("Rat", 1, 1),
+    ("Zombie", 1, 1),
+    ("Rock", 1, 1),
+    ("Spider", 1, 1),
+    ("Skeleton", 1, 1),
+    ("Kraken", 2, 1),
+    ("Reaper", 2, 1),
+    ("Golem", 2, 1),
+    ("Hydra", 3, 1),
+    ("Demon", 3, 1),
 
-    ("Wood Shield", 1),
-    ("Wind Barrier", 1),
-    ("Knight's Shield", 1),
-    ("Steel Prison", 2),
-    ("Diamond Wall", 2),
-    ("Holy Protector", 3),
-    ("Demon's King Guard", 3),
+    ("Wood Shield", 1, 2),
+    ("Wind Barrier", 1, 2),
+    ("Knight's Shield", 1, 2),
+    ("Steel Prison", 2, 2),
+    ("Diamond Wall", 2, 2),
+    ("Holy Protector", 3, 2),
+    ("Demon's King Guard", 3, 2),
 
-    ("Iceball", 1),
-    ("Fireball", 1),
-    ("Wind Blade", 1),
-    ("Poison Cloud", 2),
-    ("Thunderbolt", 2),
-    ("Meteor", 3);
+    ("Iceball", 1, 3),
+    ("Fireball", 1, 3),
+    ("Wind Blade", 1, 3),
+    ("Poison Cloud", 2, 3),
+    ("Thunderbolt", 2, 3),
+    ("Meteor", 3, 3);
 
+insert into card_type (ct_name) values
+    ("Monster"),
+    ("Shield"),
+    ("Spell");
 
 insert into card_attack (ctk_attack, ctk_hp, ctk_crd_id) values
     (2, 2, 1),

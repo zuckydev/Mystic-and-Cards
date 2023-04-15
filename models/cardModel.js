@@ -6,11 +6,12 @@ function fromDBCardToCard(dbCard) {
 }
 
 class Card {
-    constructor(cardId, deckId,name,type,active) {
+    constructor(cardId, deckId, name, type, state) {
         this.cardId = cardId;
         this.deckId = deckId;
         this.name = name;
-        this.type = type;    
+        this.type = type;
+        this.state = state; 
     }
 
     static async drawCard(game, body) {
@@ -25,16 +26,21 @@ class Card {
             }
             else {
                 // Draw a card
+
+                // Selects all cards from that rarity
                 let [cards] = await pool.query(
                     `select * from card where crd_rarity = ?`,
                     [body.rarity]);
+
+                // Selects random card from the array
                 let randomCard = utils.randomNumber(cards.length);
 
+                // Inserts it into user game card
                 await pool.query(
                     `Insert into user_game_card (ugc_user_game_id, ugc_crd_id, ugc_state_id) values (?, ?, 1)`,
-                    [game.player.id, randomCard]);
-
+                        [game.player.id, randomCard]);
             }
+
             return { status: 200, result: { msg: "You drew a card." } };
         } catch (err) {
             console.log(err);
@@ -48,7 +54,7 @@ class Card {
                 return {
                     status: 400, result: {
                         msg:
-                            "You cannot draw card since you are not currently on your turn."
+                            "You cannot play a card since you are not currently on your turn."
                     }
                 }
             }
@@ -110,6 +116,32 @@ class MatchDecks {
                 return { status: 500, result: err };
             }
     }
+    
+    static async getMatchDeck(game) {
+        try {
+            let [dbcards] = await pool.query(`Select * from card
+                inner join card_type on crd_type_id = ct_id 
+                inner join user_game_card on ugc_crd_id = crd_id
+                where ugc_user_game_id = ? or ugc_user_game_id = ?`, 
+                [game.player.id, game.opponents[0].id]);
+            let playerCards = [];
+            let oppCards = [];
+            for(let dbcard of dbcards) {
+                let card = fromDBCardToCard(dbcard);
+                if (dbcard.ugc_user_game_id == game.player.id) {
+                    playerCards.push(card);
+                } else {
+                    oppCards.push(card);
+                }
+            }
+            return {status:200, result: new MatchDecks(playerCards,oppCards)};
+        } catch (err) {
+            console.log(err);
+            return { status: 500, result: err };
+        }
+    }
 }
+
+
 
 module.exports = Card;
