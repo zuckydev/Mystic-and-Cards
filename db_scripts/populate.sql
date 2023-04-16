@@ -23,7 +23,6 @@ insert into rarity (rar_name) values
     ("Legendary");
 
 insert into user_game_card_state (ucs_state) values
-#    ("Deck"),
     ("Hand"),
     ("Zone"),
     ("Discarded");
@@ -60,10 +59,6 @@ insert into card (crd_name, crd_rarity, crd_type_id) values
     ("Thunderbolt", 2, 3),
     ("Meteor", 3, 3);
 
-insert into card_type (ct_name) values
-    ("Monster"),
-    ("Shield"),
-    ("Spell");
 
 insert into card_attack (ctk_attack, ctk_hp, ctk_crd_id) values
     (2, 2, 1),

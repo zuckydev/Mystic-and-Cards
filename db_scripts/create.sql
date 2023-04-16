@@ -67,10 +67,6 @@ create table card (
     crd_type_id int not null,
     primary key (crd_id));
 
-create table card_type (
-    ct_id int not null auto_increment,
-    ct_name varchar (60) not null,
-    primary key (ct_id));
 
 create table card_attack (
 	ctk_id int not null auto_increment,
@@ -113,12 +109,14 @@ create table user_game_board (
     ugb_id int not null auto_increment,
     ugb_card_id int not null,
     ugb_position int not null,
+    ugb_ug_id int not null,
     primary key (ugb_id));
 
 create table user_game_hand (
     ugh_id int not null auto_increment,
     ugh_card_id int not null, 
     ugh_position int not null,
+    ugh_ug_id int not null,
     primary key (ugh_id));
 
 # create table user_game_deck (
@@ -230,6 +228,10 @@ alter table card add constraint card_fk_rarity
             foreign key (crd_rarity) references rarity(rar_id)
             ON DELETE NO ACTION ON UPDATE NO ACTION;
 
-alter table card add constraint card_fk_card_type
-            foreign key (crd_type_id) references card_type(ct_id) 
-			ON DELETE NO ACTION ON UPDATE NO ACTION;
+alter table user_game_hand add constraint user_game_hand_fk_user_game
+            foreign key (ugh_ug_id) references user_game(ug_id)
+            ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+alter table user_game_board add constraint user_game_board_fk_user_game
+            foreign key (ugb_ug_id) references user_game(ug_id)
+            ON DELETE NO ACTION ON UPDATE NO ACTION;
