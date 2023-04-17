@@ -16,7 +16,7 @@ class Card {
 
     static async drawCard(game, body) {
         try {
-            if (game.player.state.name != "Playing") {
+            if (game.player.state.name == "Waiting") {
                 return {
                     status: 400, result: {
                         msg:
@@ -39,6 +39,10 @@ class Card {
                 await pool.query(
                     `Insert into user_game_card (ugc_user_game_id, ugc_crd_id, ugc_state_id) values (?, ?, 1)`,
                         [game.player.id, randomCard]);
+
+                // let maxPosition = await pool.query(`Select max(ugh_position) from user_game_hand`)
+
+                // await pool.query(`Insert into user_game_hand (ugh_position, ugh_card_id) values (?, ?)`, [maxPosition, randomCard]);
             }
 
             return { status: 200, result: { msg: "You drew a card." } };
@@ -48,9 +52,9 @@ class Card {
         }
     }
 
-    static async playCard(cardID) {
+    static async playCard(game, boardPosID, body) {
         try {
-            if (game.player.state.name != "Playing") {
+            if (game.player.state.name == "Waiting") {
                 return {
                     status: 400, result: {
                         msg:
@@ -59,8 +63,32 @@ class Card {
                 }
             }
             else {
-                await pool.query(`Update user_game_card set ugc_state_id = 2 where ugc_crd_id = ?`, [cardID]);
-            }
+
+                    // let [dbDeckCards] = await pool.query(`Select * from card
+                    // inner join user_game_card on ugc_crd_id = crd_id
+                    // where ugc_user_game_id = ? and 
+                    // crd_id = ? and ugc_state_id = 1`, [game.player.id, cardID]);
+
+                    // if (dbDeckCards.length == 0) {
+                    //     return {status:404, result:{msg:"Card not found for this player or not in hand"}};
+                    // }
+
+                    // let card = fromDBCardToCard(dbDeckCards[0]);
+                    let [[cardID]] = await pool.query(`Select ugc_crd_id as "ID" from user_game_card where ugc_id = ?`, [body.selectedCard]);
+
+                    if (!cardID) {
+                        return {status:404, result:{msg:"Please select a valid card."}};
+                    }
+
+                    let [[cardType]] = await pool.query(`Select crd_type_id from card where crd_id = ugc_crd_id = ?`, [cardID]);
+                    // let [[ugID]] = await pool.query(`Select ug_id from user_game where ug_id = ?`, [game.player.id]);
+                    
+                    await pool.query(`Insert into user_game_board (ugb_card_id, ugb_position, ugb_ug_id) values (?, ?, ?)`, [cardID, boardPosID, game.player.id]);
+                    await pool.query(`Delete from user_game_card where ugc_id = ?`, [body.selectedCard]);
+                    // await pool.query(`Update user_game_card set ugc_state_id = 2 where ugc_crd_id = ?`, [cardID]);
+
+                }
+                return {status:200, result: {msg: "Card played!"}};
 
         } catch (err) {
             console.log(err);
@@ -140,8 +168,9 @@ class MatchDecks {
             return { status: 500, result: err };
         }
     }
-}
 
+
+}
 
 
 module.exports = Card;

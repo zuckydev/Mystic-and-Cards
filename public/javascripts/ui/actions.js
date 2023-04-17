@@ -61,3 +61,11 @@ async function drawEpicCard() {
 async function drawLegendaryCard() {
     drawCardAction(3);
 }
+
+async function playCardAction(card) {
+    let result = await requestPlayCard(card);
+
+    if (!result.successful) {
+        alert("Something went wrong when playing card.");
+    }
+}

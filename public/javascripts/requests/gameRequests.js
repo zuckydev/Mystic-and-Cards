@@ -37,6 +37,28 @@ async function requestDrawCard(deck) {
     }
 }
 
+async function requestPlayCard(card) {
+    try {
+        const response = await fetch(`/api/card/playCard`,
+            {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                method: "PATCH",
+                body: JSON.stringify({
+                    selectedCard: card
+                })
+
+            });
+        return { successful: response.status == 200 };
+    } catch (err) {
+        // Treat 500 errors here
+        console.log(err);
+        return { err: err };
+    }
+}
+
 async function requestEndTurn() {
     try {
         const response = await fetch(`/api/plays/endturn`,

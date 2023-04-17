@@ -35,8 +35,8 @@ class Card {
         noTint();
     }
     click() {
-        return mouseX > this.x && mouseX < this.x+Card.width &&
-               mouseY > this.y && mouseY < this.y+Card.height;
+        return mouseX > this.x && mouseX < this.x + Card.width &&
+               mouseY > this.y && mouseY < this.y + Card.height;
     }
 }
 
