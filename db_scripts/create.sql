@@ -67,7 +67,6 @@ create table card (
     crd_type_id int not null,
     primary key (crd_id));
 
-
 create table card_attack (
 	ctk_id int not null auto_increment,
 	ctk_attack int not null,
@@ -102,22 +101,26 @@ create table user_game_card (
     ugc_crd_id int not null,
     ugc_state_id int not null,
     ugc_user_game_id int not null,
-#   ugc_position int not null,
     primary key (ugc_id));
-
-create table user_game_board (
-    ugb_id int not null auto_increment,
-    ugb_card_id int not null,
-    ugb_position int not null,
-    ugb_ug_id int not null,
-    primary key (ugb_id));
 
 create table user_game_hand (
     ugh_id int not null auto_increment,
-    ugh_card_id int not null, 
-    ugh_position int not null,
-    ugh_ug_id int not null,
+    ugh_ugc_id int not null, 
+#   ugh_position int not null,
+#   ugh_ug_id int not null,
     primary key (ugh_id));
+
+create table user_game_board (
+    ugb_id int not null auto_increment,
+    ugb_ugc_id int not null,
+    ugb_position int not null,
+#   ugb_ug_id int not null,
+    primary key (ugb_id));
+
+create table user_game_discard (
+    ugd_id int not null auto_increment,
+    ugd_ugc_id int not null,
+    primary key(ugd_id));
 
 # create table user_game_deck (
 #    ugd_id int not null auto_increment,
@@ -228,10 +231,21 @@ alter table card add constraint card_fk_rarity
             foreign key (crd_rarity) references rarity(rar_id)
             ON DELETE NO ACTION ON UPDATE NO ACTION;
 
-alter table user_game_hand add constraint user_game_hand_fk_user_game
-            foreign key (ugh_ug_id) references user_game(ug_id)
+# -- User Game Hand
+
+alter table user_game_hand add constraint user_game_hand_fk_user_game_card
+            foreign key (ugh_ugc_id) references user_game_card(ugc_id)
             ON DELETE NO ACTION ON UPDATE NO ACTION;
 
-alter table user_game_board add constraint user_game_board_fk_user_game
-            foreign key (ugb_ug_id) references user_game(ug_id)
+# -- User Game Board
+
+alter table user_game_board add constraint user_game_board_fk_user_game_card
+            foreign key (ugb_ugc_id) references user_game_card(ugc_id)
             ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+# -- User Game Discard
+
+alter table user_game_discard add constraint user_game_discard_fk_user_game_card
+            foreign key (ugd_ugc_id) references user_game_card(ugc_id)
+            ON DELETE NO ACTION ON UPDATE NO ACTION;
+
