@@ -1,94 +1,45 @@
 class Card {
-    static width = 180;
-    static height = 250;
-    constructor(card,x,y,img) {
-        this.card = card;
-        this.x = x;
-        this.y = y;
-        this.img = img;
+    static width = 200;
+    static height = 100;
+    static bgColor = [
+        [0, 204, 0, 255], // Common
+        [153, 51, 255, 255], // Epic
+        [255, 255, 0, 255] // Legendary
+    ]
+    // color is a p5js function
+    // color(bgColor[this.rarity][0], bgColor[this.rarity][1], bgColor[this.rarity][2], bgColor[this.rarity][3]);
+    
+    constructor(id, name, rarity, type, state) {
+        this.id = id;
+        this.name = name;
+        this.rarity = rarity;
+        this.type = type;
+        this.state = state;
     }
-    draw() {
-        if (!this.card.active) tint(250, 100, 100);
-        image(this.img, this.x, this.y, Card.width, Card.height);
-        
-        textAlign(CENTER, CENTER);
-        fill(255)
-        textStyle(BOLD);
-        textSize(18);
-        stroke(0);
-        strokeWeight(2);
-        // text(this.card.cost, this.x + Card.width * 0.905, this.y + Card.height * 0.065);
-        strokeWeight(1);
-        noStroke();
-        fill(0);
-        textSize(13);
-        text(this.card.name, this.x + Card.width * 0.5, this.y + Card.height * 0.63);
-        textSize(12);
-        textAlign(CENTER,TOP); 
-        text(this.card.effect, this.x + Card.width * 0.1, this.y + Card.height * 0.68,
-            Card.width * 0.8, Card.height * 0.1);
-        if (this.card.note) {
-            text(this.card.note,this.x+Card.width*0.1,this.y+Card.height*0.8,
-                    Card.width*0.8,Card.height*0.15);
-        }
-        textStyle(NORMAL);
-        noTint();
-    }
-    click() {
-        return mouseX > this.x && mouseX < this.x + Card.width &&
-               mouseY > this.y && mouseY < this.y + Card.height;
+
+    draw(x, y) {
+        fill(
+            bgColor[this.rarity][0], // Red
+            bgColor[this.rarity][1], // Green
+            bgColor[this.rarity][2], // Blue
+            bgColor[this.rarity][3]  // Alpha
+        );
+
+        rect(
+            x,
+            y,
+            this.width,
+            this.height
+        );
     }
 }
 
-
-class Deck {
-    static titleHeight=50;
-    static nCards = 3;
-
-    constructor(title,cardsInfo,x,y,clickAction,cardImg) {
-        this.title = title;
-        this.x = x;
-        this.y = y;
-        this.width = Card.width*Deck.nCards;
-        this.clickAction = clickAction;
-        this.cardImg = cardImg;
-        this.cards = this.createCards(cardsInfo);
-    }
-    
-    createCards(cardsInfo) {
-        let cards = [];
-        let x = this.x;
-        for (let cardInfo of cardsInfo) {
-            cards.push(new Card(cardInfo,x,this.y+Deck.titleHeight,this.cardImg));
-            x += Card.width;
-        }
-        return cards;
-    }
-    
-    
-    update(cardsInfo) {
-        this.cards = this.createCards(cardsInfo);
-    }
-
-
-    draw () {
-        fill(0);
-        noStroke();
-        textSize(28);
-        textAlign(CENTER,CENTER);
-        text(this.title,this.x,this.y,this.width,Deck.titleHeight);
-        for (let card of this.cards) {
-            card.draw();
-        }
-    }
-
-    click() {
-        if (this.clickAction) {
-            for (let card of this.cards) {
-                if (card.click()) {
-                    this.clickAction(card.card);
-                } 
-            }
-        }
+class MonsterCard extends Card {
+    constructor(id, name, rarity, type, hp, attack) {
+        // Call the constructor of the Card class
+        super(id, name, rarity, type);
+        // Save data specific to Monster Car
+        this.hp = hp;
+        this.attack = attack;
     }
 }
