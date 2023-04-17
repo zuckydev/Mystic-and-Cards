@@ -12,6 +12,7 @@ class Card {
         this.name = name;
         this.type = type;
         this.state = state; 
+        this.active = active;
     }
 
     static async drawCard(game, body) {
@@ -93,6 +94,25 @@ class Card {
         } catch (err) {
             console.log(err);
             return { status: 500, result: err };
+        }
+    }
+
+    static async cardAttack(card1, card2) {
+        try {
+            if (game.player.state.name == "Waiting") {
+                return {
+                    status: 400, result: {
+                        msg:
+                            "You cannot attack since you are not currently on your turn."
+                    }
+                }
+            }
+            else {
+                let [[cardID]] = await pool.query(`Select ugb_card_id from user_game_board where `);
+                let [[AP]] = await pool.query(`Select ctk_attack from card_attack where ctk_crd_id = ?`, [card1.id]);
+            }
+        } catch (error) {
+            
         }
     }
 
