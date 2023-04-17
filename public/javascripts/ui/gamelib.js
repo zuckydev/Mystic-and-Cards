@@ -33,24 +33,23 @@ async function setup() {
     GameInfo.endturnButton.mousePressed(endturnAction);
     GameInfo.endturnButton.addClass('game');
 
-    GameInfo.endturnButton = createButton('Draw Common Card');
-    GameInfo.endturnButton.parent('game');
-    GameInfo.endturnButton.position(GameInfo.width / 2, GameInfo.height / 2);
-    GameInfo.endturnButton.mousePressed(drawCommonCard);
-    GameInfo.endturnButton.addClass('game');
+    GameInfo.drawCommonCard = createButton('Draw Common Card');
+    GameInfo.drawCommonCard.parent('game');
+    GameInfo.drawCommonCard.position(GameInfo.width / 2, GameInfo.height / 2);
+    GameInfo.drawCommonCard.mousePressed(drawCommonCard);
+    GameInfo.drawCommonCard.addClass('game');
 
-    GameInfo.endturnButton = createButton('Draw Epic Card');
-    GameInfo.endturnButton.parent('game');
-    GameInfo.endturnButton.position(GameInfo.width / 2, GameInfo.height / 2 + 50);
-    GameInfo.endturnButton.mousePressed(drawEpicCard);
-    GameInfo.endturnButton.addClass('game');
+    GameInfo.drawEpicCard = createButton('Draw Epic Card');
+    GameInfo.drawEpicCard.parent('game');
+    GameInfo.drawEpicCard.position(GameInfo.width / 2, GameInfo.height / 2 + 50);
+    GameInfo.drawEpicCard.mousePressed(drawEpicCard);
+    GameInfo.drawEpicCard.addClass('game');
 
-    GameInfo.endturnButton = createButton('Draw Legendary Card');
-    GameInfo.endturnButton.parent('game');
-    GameInfo.endturnButton.position(GameInfo.width / 2, GameInfo.height / 2 + 100);
-    GameInfo.endturnButton.mousePressed(drawLegendaryCard);
-    GameInfo.endturnButton.addClass('game');
-
+    GameInfo.drawLegendaryCard = createButton('Draw Legendary Card');
+    GameInfo.drawLegendaryCard.parent('game');
+    GameInfo.drawLegendaryCard.position(GameInfo.width / 2, GameInfo.height / 2 + 100);
+    GameInfo.drawLegendaryCard.mousePressed(drawLegendaryCard);
+    GameInfo.drawLegendaryCard.addClass('game');
     
     GameInfo.prepareUI();
 
