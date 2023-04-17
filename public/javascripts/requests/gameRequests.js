@@ -37,7 +37,7 @@ async function requestDrawCard(deck) {
     }
 }
 
-async function requestPlayCard(card) {
+async function requestPlayCard(card, boardPos) {
     try {
         const response = await fetch(`/api/card/playCard`,
             {
@@ -47,7 +47,8 @@ async function requestPlayCard(card) {
                 },
                 method: "PATCH",
                 body: JSON.stringify({
-                    selectedCard: card
+                    selectedCard: card,
+                    boardPos: boardPos
                 })
 
             });

@@ -98,12 +98,29 @@ class Play {
         where ug_game_id = ? and ug_user_id = ?`,
             [gameId, userId]);
 
-        [playerInfo.hand] = await pool.query(`select * from user_game_card where ugc_state_id = 1`);
+        /* [playerInfo.hand] = await pool.query(`select * from user_game_card where ugc_state_id = 1`);
 
         [playerInfo.zone] = await pool.query(`select * from user_game_card where ugc_state_id = 2`);
 
-        [playerInfo.discard] = await pool.query(`select * from user_game_card where ugc_state_id = 3`);
+        [playerInfo.discard] = await pool.query(`select * from user_game_card where ugc_state_id = 3`); */
 
+        [playerInfo.hand] = await pool.query(
+            `Select *
+            from user_game_hand, user_game_card
+            where ugc_id = ugh_ugc_id and ugc_user_game_id = ?`,
+                [userId]);
+
+        [playerInfo.board] = await pool.query(
+            `Select *
+            from user_game_card, user_game_board
+            where ugc_id = ugb_ugc_id and ugc_user_game_id = ?`,
+            [userId]);
+
+        [playerInfo.discard] = await pool.query(
+            `Select *
+            from user_game_card, user_game_discard
+            where ugc_id = ugd_ugc_id and ugc_user_game_id = ?`,
+            [userId]);
 
         return playerInfo
     }
