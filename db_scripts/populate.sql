@@ -17,6 +17,8 @@ insert into user_game_state (ugst_state) values ('End');
 # insert into scoreboard_state (sbs_state) values ('Lost');
 # insert into scoreboard_state (sbs_state) values ('Won');
 
+# -- Game Specific --
+
 insert into rarity (rar_name) values
     ("Common"),
     ("Epic"),
@@ -26,11 +28,6 @@ insert into user_game_card_state (ucs_state) values
     ("Hand"),
     ("Zone"),
     ("Discarded");
-
-# insert into deck (dec_rarity_id) values
-#    (1),
-#    (2),
-#    (3);
 
 insert into card (crd_name, crd_rarity, crd_type_id) values
     ("Rat", 1, 1),
