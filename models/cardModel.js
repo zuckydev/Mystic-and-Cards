@@ -38,16 +38,26 @@ class Card {
 
                 // Add new card to user game card
                 await pool.query(
-                    `Insert into user_game_card (ugc_user_game_id, ugc_crd_id, ugc_state_id) values (?, ?, 1)`,
+                    `Insert
+                    into user_game_card
+                    (ugc_user_game_id, ugc_crd_id, ugc_state_id)
+                    values (?, ?, 1)`,
                         [game.player.id, randomCard]);
 
                 // Getting the newly created user card id 
-                let [[userCardData]] = await pool.query(`Select max(ugc_id) as "maxID" from user_game_card where ugc_user_game_id = ?`,
-                    [game.player.id]);
+                let [[userCardData]] = await pool.query(
+                    `Select
+                    max(ugc_id) as "maxID"
+                    from user_game_card 
+                    where ugc_user_game_id = ?`,
+                        [game.player.id]);
 
                 // Add the newly created card to the hand
-                await pool.query(`Insert into user_game_hand (ugh_ugc_id) values (?)`,
-                    [userCardData.maxID]);
+                await pool.query(
+                    `Insert 
+                    into user_game_hand
+                    (ugh_ugc_id) values (?)`,
+                        [userCardData.maxID]);
             }
 
             return { status: 200, result: { msg: "You drew a card." } };
@@ -68,17 +78,6 @@ class Card {
                 }
             }
             else {
-
-                    // let [dbDeckCards] = await pool.query(`Select * from card
-                    // inner join user_game_card on ugc_crd_id = crd_id
-                    // where ugc_user_game_id = ? and 
-                    // crd_id = ? and ugc_state_id = 1`, [game.player.id, cardID]);
-
-                    // if (dbDeckCards.length == 0) {
-                    //     return {status:404, result:{msg:"Card not found for this player or not in hand"}};
-                    // }
-
-                    // let card = fromDBCardToCard(dbDeckCards[0]);
                     let [[cardData]] = await pool.query(`Select ugc_crd_id as "ID" from user_game_card where ugc_id = ?`, [cardID]);
 
                     if (!cardData) {
