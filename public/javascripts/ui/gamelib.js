@@ -16,7 +16,6 @@ function preload() {
 
 }
 
-
 async function setup() {
     let canvas = createCanvas(GameInfo.width, GameInfo.height);
     canvas.parent('game');
@@ -35,7 +34,7 @@ async function setup() {
 
     GameInfo.drawCommonCard = createButton('Draw Common Card');
     GameInfo.drawCommonCard.parent('game');
-    GameInfo.drawCommonCard.position(GameInfo.width / 2, GameInfo.height / 2);
+    GameInfo.drawCommonCard.position(GameInfo.width / 2 + 200, GameInfo.height / 2);
     GameInfo.drawCommonCard.mousePressed(drawCommonCard);
     GameInfo.drawCommonCard.addClass('game');
 
@@ -69,9 +68,8 @@ function draw() {
         GameInfo.playerHand.draw();
     } else {
         GameInfo.scoreBoard.draw();
+        GameInfo.playerHand.draw();
     }
 }
 
-async function mouseClicked() {
-
-}
+async function mouseClicked() {}

@@ -7,6 +7,7 @@ async function getGameInfo() {
         GameInfo.game = result.game;
         if (GameInfo.scoreBoard) GameInfo.scoreBoard.update(GameInfo.game);
         else GameInfo.scoreBoard = new ScoreBoard(GameInfo.game);
+
         // if game ended we get the scores and prepare the ScoreWindow
         if (GameInfo.game.state == "Finished") {
             let result = await requestScore();
@@ -31,13 +32,34 @@ async function closeScore() {
 }
 
 async function getBoardInfo() {
+    // Get the board info from the server
     let result = await requestBoardInfo();
     if (!result.successful) {
         alert("Something is wrong with the game please login again!");
         window.location.pathname = "index.html";
-    } else {
+    }
+    else {
         GameInfo.board = result.board;
         console.log(GameInfo.board);
+
+        if (GameInfo.playerHand) {
+            GameInfo.playerHand.update(result.board.player.hand);
+        } 
+        else {
+            GameInfo.playerHand = new PlayerHand ("Player Cards", result.board.player.hand, 100, 400, playCardAction);
+        }
+    }
+}
+
+async function getPlayerHandInfo(user) {
+    let result = await getPlayerHand(user);
+    if (!result.successful) {
+        alert("Something is wrong with the game please login again!");
+        window.location.pathname = "index.html";
+    } else {
+        GameInfo.playerHand = result;
+        if (GameInfo.playerHand) GameInfo.playerHand.update(GameInfo.hand);
+        else GameInfo.playerHand = new PlayerHand("My Cards", 200, 600, await playCardAction);
     }
 }
 

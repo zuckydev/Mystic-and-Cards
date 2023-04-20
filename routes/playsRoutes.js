@@ -26,4 +26,18 @@ router.patch('/endturn', auth.verifyAuth, async function (req, res, next) {
     }
 });
 
+router.get('/', auth.verifyAuth, async function (req, res, next) {
+    try {
+        if (!req.game) {
+            res.status(400).send({ msg: "You are not at a game, please create or join a game" });
+        } else {
+            let result = await Play.getPlayerHand(req.player);
+            res.status(result.status).send(result.result);
+        }
+    } catch (err) {
+        console.log(err);
+        res.status(500).send(err);
+    }
+});
+
 module.exports = router;

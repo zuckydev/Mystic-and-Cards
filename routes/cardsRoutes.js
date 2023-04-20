@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const Card = require("../models/cardModel");
+const Card = require("../models/cardsModel");
 const Play = require("../models/playsModel");
 const auth = require("../middleware/auth");
 
-router.get('/', auth.verifyAuth, async function (req, res, next) {
+router.get('/getBoard', auth.verifyAuth, async function (req, res, next) {
     try {
         console.log("Get information about the board");
         if (!req.game) {
@@ -19,6 +19,8 @@ router.get('/', auth.verifyAuth, async function (req, res, next) {
         res.status(500).send(err);
     }
 });
+
+
 
 router.post("/draw", auth.verifyAuth, async function (req, res, next) {
     try {

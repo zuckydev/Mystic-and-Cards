@@ -1,7 +1,7 @@
 // Actions
 async function requestBoardInfo() {
     try {
-        const response = await fetch(`/api/card/`);
+        const response = await fetch(`/api/cards/getBoard`);
         let result = await response.json();
         return {
             successful: response.status == 200,
@@ -15,9 +15,25 @@ async function requestBoardInfo() {
     }
 }
 
+async function requestPlayerHandInfo() {
+    try {
+        const response = await fetch(`/api/cards`);
+        let result = await response.json();
+        return {
+            successful: response.status == 200,
+            unauthenticated: response.status == 401,
+            playerHand: result
+        };
+    } catch (err) {
+        // Treat 500 errors here
+        console.log(err);
+        return { err: err };
+    }
+}
+
 async function requestDrawCard(deck) {
     try {
-        const response = await fetch(`/api/card/draw`,
+        const response = await fetch(`/api/cards/draw`,
             {
                 headers: {
                     'Accept': 'application/json',
@@ -39,7 +55,7 @@ async function requestDrawCard(deck) {
 
 async function requestPlayCard(card, boardPos) {
     try {
-        const response = await fetch(`/api/card/playCard`,
+        const response = await fetch(`/api/cards/playCard`,
             {
                 headers: {
                     'Accept': 'application/json',

@@ -13,6 +13,7 @@ class GameInfo {
     static card;
     static images = {};
     static sounds = {};
+    static hand;
 
     // rendererers
     static scoreBoard;

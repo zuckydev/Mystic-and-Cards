@@ -86,6 +86,12 @@ create table user_game_card (
     ugc_user_game_id int not null,
     primary key (ugc_id));
 
+create table user_game_card_attack (
+    uca_id int not null auto_increment,
+    uca_ugc_id int not null,
+    uca_hp int not null,
+    primary key (uca_id));
+
 create table user_game_hand (
     ugh_id int not null auto_increment,
     ugh_ugc_id int not null, 
@@ -153,6 +159,10 @@ alter table user_game_card add constraint user_game_card_fk_user_game_card_state
 
 alter table user_game_card add constraint user_game_card_fk_user_game
             foreign key (ugc_user_game_id) references user_game(ug_id)
+            ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+alter table user_game_card_attack add constraint user_game_card_attack_fk_user_game_card
+            foreign key (uca_ugc_id) references user_game_card(ugc_id)
             ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 # -- User Game Hand --

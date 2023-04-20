@@ -1,6 +1,6 @@
 class Card {
-    static width = 200;
-    static height = 100;
+    static width = 150;
+    static height = 200;
     static bgColor = [
         [0, 204, 0, 255], // Common
         [153, 51, 255, 255], // Epic
@@ -17,25 +17,30 @@ class Card {
 
     draw(x, y) {
         fill(
-            bgColor[this.rarity][0], // Red
-            bgColor[this.rarity][1], // Green
-            bgColor[this.rarity][2], // Blue
-            bgColor[this.rarity][3]  // Alpha
+            Card.bgColor[this.rarity][0], // Red
+            Card.bgColor[this.rarity][1], // Green
+            Card.bgColor[this.rarity][2], // Blue
+            Card.bgColor[this.rarity][3]  // Alpha
         );
 
         rect(
             x,
             y,
-            this.width,
-            this.height
+            Card.width,
+            Card.height
         );
+    }
+
+    click() {
+        return mouseX > this.x && mouseX < this.x + Card.width &&
+               mouseY > this.y && mouseY < this.y + Card.height;
     }
 }
 
 class MonsterCard extends Card {
-    constructor(id, name, rarity, type, hp, attack) {
+    constructor(id, name, rarity, type, state, hp, attack) {
         // Call the constructor of the Card class
-        super(id, name, rarity, type);
+        super(id, name, rarity, type, state);
         // Save data specific to Monster Card
         this.hp = hp;
         this.attack = attack;
@@ -43,37 +48,43 @@ class MonsterCard extends Card {
 }
 
 class SpellCard extends Card {
-    constructor(id, name, rarity, type, attack) {
-        super(id, name, rarity, type)
-        thid.attack = attack;
+    constructor(id, name, rarity, type, state, attack) {
+        super(id, name, rarity, type, state)
+        this.attack = attack;
 
     }
 }
 
 class ShieldCard extends Card {
-    constructor(id, name, rarity, type, hp) {
-        super(id, name, rarity, type)
-        thid.hp = hp;
-
+    constructor(id, name, rarity, type, state, hp) {
+        super(id, name, rarity, type, state)
+        this.hp = hp;
     }
 }
 
 class PlayerHand {
     static nCards = 5;
+    static titleHeight = 50;
 
     constructor(title, cardsInfo, x, y, clickAction) {
         this.title = title;
         this.x = x;
         this.y = y;
-        this.width = Card.width * Deck.nCards;
+        this.width = Card.width * PlayerHand.nCards;
         this.clickAction = clickAction;
         this.cards = this.createCards(cardsInfo);
     }
+
     createCards(cardsInfo) {
         let cards = [];
+        let monsterCards = [];
         let x = this.x;
         for (let cardInfo of cardsInfo) {
-            cards.push(new Card(cardInfo, x, this.y + Deck.titleHeight));
+            console.log(cardInfo);
+            cards.push(new Card(cardInfo.id, cardInfo.name, cardInfo.rarity, cardInfo.type, cardInfo.state));
+            if (cardInfo.type == 1) {
+                monsterCards.push(new MonsterCard(cardInfo.id, cardInfo.name, cardInfo.rarity, cardInfo.type, cardInfo.state))
+            }
             x += Card.width;
         }
         return cards;
@@ -84,13 +95,11 @@ class PlayerHand {
     }
 
     draw () {
-        fill(0);
-        noStroke();
         textSize(28);
         textAlign(CENTER, CENTER);
-        text(this.title, this.x, this.y, this.width, PlayerHand.titleheight);
+        // text(this.title, this.x, this.y, this.width, 400);
         for (let card of this.cards) {
-            card.draw();
+            card.draw(0, 0);
         }
 
     }

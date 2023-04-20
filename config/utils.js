@@ -11,3 +11,7 @@ module.exports.randomNumber = function randomNumber(maxN) {
     let randomNumber = Math.floor(Math.random() * maxN) + 1;
     return randomNumber;
 }
+
+module.exports.maxHP = 50;
+module.exports.goldPerTurn = 5;
+module.exports.nCards = 3;
