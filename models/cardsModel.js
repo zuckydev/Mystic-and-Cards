@@ -16,11 +16,20 @@ class Card {
 
     static async drawCard(game, body) {
         try {
+            let playernCards = await pool.query(`Select count(ugc_id) from user_game_card where ugc_user_game_id = ?`, [game.player.id]);
+                
             if (game.player.state.name == "Waiting") {
                 return {
                     status: 400, result: {
                         msg:
                             "You cannot draw card since you are not currently on your turn."
+                    }
+                }
+            } else if (playernCards > 5) {
+                return {
+                    status: 400, result: {
+                        msg:
+                            "You already drew the maximum amount of cards."
                     }
                 }
             }
@@ -90,7 +99,10 @@ class Card {
                 }
             }
             else {
-                    let [[cardData]] = await pool.query(`Select ugc_crd_id as "ID" from user_game_card where ugc_id = ?`, [cardID]);
+                    let [[cardData]] = await pool.query(`
+                    Select ugc_crd_id as "ID"
+                    from user_game_card where ugc_id = ?`,
+                        [cardID]);
 
                     if (!cardData) {
                         return {status:404, result:{msg:"Please select a valid card."}};

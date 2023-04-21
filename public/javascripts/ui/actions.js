@@ -48,20 +48,29 @@ async function getBoardInfo() {
         else {
             GameInfo.playerHand = new PlayerHand ("Player Cards", result.board.player.hand, 100, 400, playCardAction);
         }
+
+        for (let i = 0; i < game.opponents.length; i++) {
+            const element = game.opponents[i];
+            if (GameInfo.oppHand) {
+                GameInfo.oppHand.update(result.board.game.opponents[i].hand);
+            } else {
+                GameInfo.oppHand = new OppHand ("Opponent Cards", result.board.opponents[i].hand, 100, 400, playCardAction);
+            }
+        }
     }
 }
 
-async function getPlayerHandInfo(user) {
-    let result = await getPlayerHand(user);
-    if (!result.successful) {
-        alert("Something is wrong with the game please login again!");
-        window.location.pathname = "index.html";
-    } else {
-        GameInfo.playerHand = result;
-        if (GameInfo.playerHand) GameInfo.playerHand.update(GameInfo.hand);
-        else GameInfo.playerHand = new PlayerHand("My Cards", 200, 600, await playCardAction);
-    }
-}
+// async function getPlayerHandInfo(user) {
+//     let result = await getPlayerHand(user);
+//     if (!result.successful) {
+//         alert("Something is wrong with the game please login again!");
+//         window.location.pathname = "index.html";
+//     } else {
+//         GameInfo.playerHand = result;
+//         if (GameInfo.playerHand) GameInfo.playerHand.update(GameInfo.hand);
+//         else GameInfo.playerHand = new PlayerHand("My Cards", 200, 600, await playCardAction);
+//     }
+// }
 
 async function drawCardAction(deck) {
     let result = await requestDrawCard(deck);

@@ -81,7 +81,7 @@ class Play {
 
             // Insert score lines with the state and points.
             // For this template both are  tied (id = 1) and with one point 
-            let sqlScore = `Insert into scoreboard (sb_user_game_id,sb_state_id,sb_points) values (?,?,?)`;
+            let sqlScore = `Insert into scoreboard (sb_user_game_id, sb_state_id, sb_points) values (?,?,?)`;
             await pool.query(sqlScore, [game.player.id, 1, 1]);
             await pool.query(sqlScore, [game.opponents[0].id, 1, 1]);
 
@@ -160,7 +160,7 @@ class Play {
             [userId]);
 
         console.log(playerInfo);
-
+        
         return playerInfo
     }
 

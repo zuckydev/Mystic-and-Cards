@@ -34,19 +34,19 @@ async function setup() {
 
     GameInfo.drawCommonCard = createButton('Draw Common Card');
     GameInfo.drawCommonCard.parent('game');
-    GameInfo.drawCommonCard.position(GameInfo.width / 2 + 200, GameInfo.height / 2);
+    GameInfo.drawCommonCard.position(GameInfo.width - 250, GameInfo.height / 2 - 250);
     GameInfo.drawCommonCard.mousePressed(drawCommonCard);
     GameInfo.drawCommonCard.addClass('game');
 
     GameInfo.drawEpicCard = createButton('Draw Epic Card');
     GameInfo.drawEpicCard.parent('game');
-    GameInfo.drawEpicCard.position(GameInfo.width / 2, GameInfo.height / 2 + 50);
+    GameInfo.drawEpicCard.position(GameInfo.width - 250, (GameInfo.height / 2) - 200);
     GameInfo.drawEpicCard.mousePressed(drawEpicCard);
     GameInfo.drawEpicCard.addClass('game');
 
     GameInfo.drawLegendaryCard = createButton('Draw Legendary Card');
     GameInfo.drawLegendaryCard.parent('game');
-    GameInfo.drawLegendaryCard.position(GameInfo.width / 2, GameInfo.height / 2 + 100);
+    GameInfo.drawLegendaryCard.position(GameInfo.width - 250, (GameInfo.height / 2) - 150);
     GameInfo.drawLegendaryCard.mousePressed(drawLegendaryCard);
     GameInfo.drawLegendaryCard.addClass('game');
     
@@ -67,9 +67,11 @@ function draw() {
     } else if (GameInfo.game.state == "Started") {
         GameInfo.playerHand.draw();
         GameInfo.scoreBoard.draw();
+        GameInfo.oppHand.draw();
     } else {
         GameInfo.playerHand.draw();
         GameInfo.scoreBoard.draw();
+        GameInfo.oppHand.draw();
     }
 }
 
