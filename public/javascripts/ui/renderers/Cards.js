@@ -2,9 +2,14 @@ class Card {
     static width = 150;
     static height = 200;
     static bgColor = [
-        [0, 204, 0, 255], // Common
-        [153, 51, 255, 255], // Epic
-        [255, 255, 0, 255] // Legendary
+        [91, 255, 129, 255], // Common
+        [173, 91, 255, 255], // Epic
+        [255, 194, 91, 255] // Legendary
+    ]
+    static cardType = [
+        "Monster Card",
+        "Shield Card",
+        "Spell Card"
     ]
     
     constructor(id, name, rarity, type, state) {
@@ -17,10 +22,10 @@ class Card {
 
     draw(x, y) {
         fill(
-            Card.bgColor[this.rarity][0], // Red
-            Card.bgColor[this.rarity][1], // Green
-            Card.bgColor[this.rarity][2], // Blue
-            Card.bgColor[this.rarity][3]  // Alpha
+            Card.bgColor[this.rarity - 1][0], // Red
+            Card.bgColor[this.rarity - 1][1], // Green
+            Card.bgColor[this.rarity - 1][2], // Blue
+            Card.bgColor[this.rarity - 1][3]  // Alpha
         );
 
         rect(
@@ -29,6 +34,13 @@ class Card {
             Card.width,
             Card.height
         );
+
+        fill(0, 0, 0, 255);
+        textSize(12);
+        textAlign(CENTER, CENTER);
+        text(this.name, x, y, Card.width, Card.height * 0.25);
+        text(Card.cardType[this.type - 1], x, y + (Card.height * 0.75), Card.width, Card.height * 0.25);
+
     }
 
     click() {
@@ -45,13 +57,11 @@ class MonsterCard extends Card {
         this.hp = hp;
         this.attack = attack;
     }
-}
 
-class SpellCard extends Card {
-    constructor(id, name, rarity, type, state, attack) {
-        super(id, name, rarity, type, state)
-        this.attack = attack;
-
+    draw(x, y) {
+        super.draw(x, y);
+        text(this.hp, x, y  + (Card.height * 0.5), Card.width, Card.height * 0.5);
+        text(this.attack, x, y  + (Card.height * 0.6), Card.width, Card.height * 0.4);
     }
 }
 
@@ -59,6 +69,24 @@ class ShieldCard extends Card {
     constructor(id, name, rarity, type, state, hp) {
         super(id, name, rarity, type, state)
         this.hp = hp;
+    }
+    
+    draw(x, y) {
+        super.draw(x, y);
+        text(this.hp, x, y  + (Card.height * 0.5), Card.width, Card.height * 0.5);
+    } 
+    
+}
+
+class SpellCard extends Card {
+    constructor(id, name, rarity, type, state, attack) {
+        super(id, name, rarity, type, state)
+        this.attack = attack;
+    }
+    
+    draw(x, y) {
+        super.draw(x, y);
+        text(this.attack, x, y  + (Card.height * 0.6), Card.width, Card.height * 0.4);
     }
 }
 
@@ -77,15 +105,17 @@ class PlayerHand {
 
     createCards(cardsInfo) {
         let cards = [];
-        let monsterCards = [];
-        let x = this.x;
         for (let cardInfo of cardsInfo) {
-            console.log(cardInfo);
-            cards.push(new Card(cardInfo.id, cardInfo.name, cardInfo.rarity, cardInfo.type, cardInfo.state));
+            // cards.push(new Card(cardInfo.id, cardInfo.name, cardInfo.rarity, cardInfo.type, cardInfo.state));
             if (cardInfo.type == 1) {
-                monsterCards.push(new MonsterCard(cardInfo.id, cardInfo.name, cardInfo.rarity, cardInfo.type, cardInfo.state))
+                cards.push(new MonsterCard(cardInfo.id, cardInfo.name, cardInfo.rarity, cardInfo.type, cardInfo.state, cardInfo.hp, cardInfo.attack));
             }
-            x += Card.width;
+            else if (cardInfo.type == 2) {
+                cards.push(new ShieldCard(cardInfo.id, cardInfo.name, cardInfo.rarity, cardInfo.type, cardInfo.state, cardInfo.hp));
+            }
+            else if (cardInfo.type == 3) {
+                cards.push(new SpellCard(cardInfo.id, cardInfo.name, cardInfo.rarity, cardInfo.type, cardInfo.state, cardInfo.attack));
+            }
         }
         return cards;
     }
@@ -98,8 +128,10 @@ class PlayerHand {
         textSize(28);
         textAlign(CENTER, CENTER);
         // text(this.title, this.x, this.y, this.width, 400);
+        let x = 200;
         for (let card of this.cards) {
-            card.draw(0, 0);
+            card.draw(x, 300);
+            x += Card.width;
         }
 
     }

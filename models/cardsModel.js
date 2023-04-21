@@ -29,16 +29,16 @@ class Card {
                 let [cards] = await pool.query(
                     `select * from card where crd_rarity = ?`,
                         [body.rarity]);
-
+                console.log(body.rarity);
                 // Selects random card from the array
-                let randomCard = utils.randomNumber(cards.length);
-
+                let randomCard = cards[utils.randomNumber(cards.length)];
+                console.log(randomCard);
                 // Add new card to user game card
                 await pool.query(
                     `Insert into user_game_card
                     (ugc_user_game_id, ugc_crd_id, ugc_state_id)
                     values (?, ?, 1)`,
-                        [game.player.id, randomCard]);
+                        [game.player.id, randomCard.crd_id]);
 
                 // let [[hp]] = await pool.query(`Select `)
 
@@ -52,7 +52,7 @@ class Card {
                 let [[cardType]] = await pool.query(
                     `Select crd_type_id from card, user_game_card
                     where crd_id = ugc_crd_id and ugc_id = ?`,
-                        [userCardDate.maxID]);
+                        [userCardData.maxID]);
 
                 // Add the newly created card to the hand
                 await pool.query(
@@ -99,7 +99,11 @@ class Card {
                     let [[cardType]] = await pool.query(`Select crd_type_id from card where crd_id = ugc_crd_id and ugc_crd_id = ?`, [cardData.ID]);
                     // let [[ugID]] = await pool.query(`Select ug_id from user_game where ug_id = ?`, [game.player.id]);
                     
-                    await pool.query(`Insert into user_game_board (ugb_card_id, ugb_position, ugb_ug_id) values (?, ?, ?)`, [cardID, boardPos, game.player.id]);
+                    await pool.query(`
+                    Insert into user_game_board
+                    (ugb_card_id, ugb_position, ugb_ug_id)
+                    values (?, ?, ?)`, 
+                        [cardID, boardPos, game.player.id]);
                     await pool.query(`Delete from user_game_card where ugc_id = ?`, [cardData]);
                     // await pool.query(`Update user_game_card set ugc_state_id = 2 where ugc_crd_id = ?`, [cardID]);
 

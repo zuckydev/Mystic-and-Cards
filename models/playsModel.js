@@ -103,6 +103,7 @@ class Play {
     }
 
     static async getUserBoardInfo(userId, gameId) {
+
         let [[playerInfo]] = await pool.query(`
         select ug_gold as "gold", ug_mine_level as "mineLevel"
         from user_game
@@ -110,12 +111,41 @@ class Play {
             [gameId, userId]);
 
         [playerInfo.hand] = await pool.query(
-            `Select ugc_crd_id as "cardID",
-            ugc_id as "id", ugc_user_game_id as "owner",
-            ugh_id as "handID", crd_name as "name", crd_rarity as "rarity", crd_type_id as "type", ugc_state_id as "state"
+            `Select
+            ugc_id as "id",
+            ugc_crd_id as "cardID",
+            ugc_user_game_id as "owner",
+            ugh_id as "handID",
+            crd_name as "name",
+            crd_rarity as "rarity",
+            crd_type_id as "type",
+            ugc_state_id as "state"
             from user_game_hand, user_game_card, card
             where ugc_id = ugh_ugc_id and ugc_user_game_id = ? and ugc_crd_id = crd_id`,
                 [userId]);
+
+        for (let i = 0; i < playerInfo.hand.length; i++) {
+            let typeDataDB = {};
+            if (playerInfo.hand[i].type === 1) {
+                [[typeDataDB]] = await pool.query(
+                    `Select ctk_hp as "hp", ctk_attack as "attack" from card_attack, user_game_card where ctk_crd_id = ?`,
+                        [playerInfo.hand[i].cardID]);
+                playerInfo.hand[i].attack = typeDataDB.attack;
+                playerInfo.hand[i].hp = typeDataDB.hp;
+            }
+            else if (playerInfo.hand[i].type === 2) {
+                [[typeDataDB]] = await pool.query(
+                    `Select csh_hp as "hp" from card_shield, user_game_card where csh_crd_id = ?`,
+                        [playerInfo.hand[i].cardID]);
+                playerInfo.hand[i].hp = typeDataDB.hp;
+            }
+            else if (playerInfo.hand[i].type === 3) {
+                [[typeDataDB]] = await pool.query(
+                    `Select csp_attack as "attack" from card_spell, user_game_card where csp_crd_id = ?`,
+                        [playerInfo.hand[i].cardID]);
+                playerInfo.hand[i].attack = typeDataDB.attack;
+            }
+        }
 
         [playerInfo.board] = await pool.query(
             `Select *
@@ -128,6 +158,8 @@ class Play {
             from user_game_card, user_game_discard
             where ugc_id = ugd_ugc_id and ugc_user_game_id = ?`,
             [userId]);
+
+        console.log(playerInfo);
 
         return playerInfo
     }

@@ -56,7 +56,7 @@ async function setup() {
 }
 
 function draw() {
-    background(95, 145, 100);
+    background(210, 210, 210);
     if (GameInfo.loading) {
         textAlign(CENTER, CENTER);
         textSize(40);
@@ -66,9 +66,10 @@ function draw() {
         GameInfo.scoreWindow.draw();
     } else if (GameInfo.game.state == "Started") {
         GameInfo.playerHand.draw();
-    } else {
         GameInfo.scoreBoard.draw();
+    } else {
         GameInfo.playerHand.draw();
+        GameInfo.scoreBoard.draw();
     }
 }
 
