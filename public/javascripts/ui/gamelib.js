@@ -68,15 +68,20 @@ function draw() {
         GameInfo.playerHand.draw();
         GameInfo.scoreBoard.draw();
         GameInfo.oppHand.draw();
+        GameInfo.playerBoard.draw();
+        GameInfo.oppBoard.draw();
+        
     } else {
         GameInfo.playerHand.draw();
         GameInfo.scoreBoard.draw();
         GameInfo.oppHand.draw();
+        GameInfo.playerBoard.draw();
+        GameInfo.oppBoard.draw();
     }
 }
 
 async function mouseClicked() {
-    if ( GameInfo.playerDeck) {
-        GameInfo.playerDeck.click();
+    if ( GameInfo.playerHand) {
+        GameInfo.playerHand.click();
     }
 }

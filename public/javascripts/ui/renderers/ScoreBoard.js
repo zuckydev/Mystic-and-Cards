@@ -4,8 +4,9 @@ class ScoreBoard {
     static height = 100;
     static x = 10;
     static y = 10;
-    constructor(game) {
+    constructor(game, board) {
         this.game = game;
+        this.board = board;
     }
     draw() {
         fill(255,230,0);
@@ -20,7 +21,7 @@ class ScoreBoard {
         text("Opponent: " + this.game.opponents[0].name, ScoreBoard.x + 10, ScoreBoard.y + 3 * ScoreBoard.height / 4);
         text(`(${this.game.player.state})`, ScoreBoard.x + 200, ScoreBoard.y + 2 * ScoreBoard.height / 4);
         text(`(${this.game.opponents[0].state})`, ScoreBoard.x + 200, ScoreBoard.y + 3 * ScoreBoard.height / 4);
-        text("Player Gold: " + this.game.player.gold, ScoreBoard.x + 10, ScoreBoard.y + 4 * ScoreBoard.height / 4);
+        text("Player Gold: " + this.board.player.gold, ScoreBoard.x + 10, ScoreBoard.y + 4 * ScoreBoard.height / 4);
         if (this.game.state == "Finished") {
             fill(200, 0, 0);
             textSize(24);
@@ -30,7 +31,8 @@ class ScoreBoard {
         }
     }
 
-    update(game) {
+    update(game, board) {
         this.game = game;
+        this.board = board;
     }
 }

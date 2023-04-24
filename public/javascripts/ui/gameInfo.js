@@ -20,6 +20,8 @@ class GameInfo {
     static scoreWindow;
     static playerHand;
     static oppHand;
+    static playerBoard;
+    static oppBoard;
     // static playerBoard;
     // static cards;
 

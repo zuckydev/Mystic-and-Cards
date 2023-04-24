@@ -14,15 +14,19 @@ class Card {
         "Spell"
     ]
     
-    constructor(id, name, rarity, type, state) {
+    constructor(id, name, rarity, type, state, x, y) {
         this.id = id;
         this.name = name;
         this.rarity = rarity;
         this.type = type;
         this.state = state;
+        this.x = null;
+        this.y = null;
     }
 
     draw(x, y) {
+        this.x = x;
+        this.y = y;
         fill(
             Card.bgColor[this.rarity - 1][0], // Red
             Card.bgColor[this.rarity - 1][1], // Green
@@ -101,12 +105,14 @@ class PlayerHand {
     static nCards = 5;
     static titleHeight = 50;
 
-    constructor(title, cardsInfo, x, y, clickAction) {
+    constructor(title, cardsInfo, x, y, clickAction, cardSpacing, scale) {
         this.title = title;
         this.x = x;
         this.y = y;
         this.width = Card.width * PlayerHand.nCards;
         this.clickAction = clickAction;
+        this.cardSpacing = cardSpacing;
+        this.scale = scale;
         this.cards = this.createCards(cardsInfo);
     }
 
@@ -137,8 +143,8 @@ class PlayerHand {
         // text(this.title, this.x, this.y, this.width, 400);
         let x = 400;
         for (let card of this.cards) {
-            card.draw(x, 450);
-            x += Card.width;
+            card.draw(x, this.y);
+            x += (Card.width + this.cardSpacing);
         }
     }
 
@@ -146,9 +152,7 @@ class PlayerHand {
         if (this.clickAction) {
             for (let card of this.cards) {
                 if (card.click()) {
-                    this.clickAction(card.card);
-                    console.log("Card Clicked:");
-                    console.log(card);
+                    this.clickAction(card);
                 }
             }
         }
@@ -225,3 +229,13 @@ class OppHand {
         }
     }
 }
+
+// class PlayerBoard {
+//     static nCards = 3;
+//     constructor(title, cardsInfo, x, y) {
+//         this.title = title;
+//         this.x = x;
+//         this.y = y;
+//         this.width = Card.width * PlayerHand.nCards;
+//     }
+// }

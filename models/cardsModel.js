@@ -17,47 +17,53 @@ class Card {
     static async drawCard(game, body) {
         try {
             let [[playernCards]] = await pool.query(`Select count(ugc_id) as "num" from user_game_card where ugc_user_game_id = ?`, [game.player.id]);
-                
+            let [[playerGold]] = await pool.query(`Select ug_gold as "gold" from user_game where ug_id = ?`, [game.player.id]);
+            let [[cost]] = await pool.query(`Select rar_cost as "cost" from rarity where rar_id = ?`, [body.rarity]);
+            
             if (game.player.state.name == "Waiting") {
                 return {
                     status: 400, result: {
                         msg:
-                            "You cannot draw card since you are not currently on your turn."
+                        "You cannot draw card since you are not currently on your turn."
                     }
                 }
-            } else if (playernCards.num > 5) {
+            }
+            else if (playernCards.num > 5) {
                 return {
                     status: 400, result: {
                         msg:
                             "You already drew the maximum amount of cards."
+                        }
+                    }
+                }
+            else if (playerGold.gold < cost.cost)
+            {
+                return {
+                    status: 400, result: {
+                        msg:
+                        "You do not have enough gold to draw this card."
                     }
                 }
             }
-            else {
-                // Selects all cards from that rarity
-                let [cards] = await pool.query(
-                    `select * from card where crd_rarity = ?`,
+            
+                else {
+                    // Ajusts player gold
+                    playerGold.gold -= cost.cost;
+                    await pool.query(`Update user_game set ug_gold = ? where ug_id = ?`, [playerGold.gold, game.player.id]);
+                    // Selects all cards from that rarity
+                    let [cards] = await pool.query(
+                        `select * from card where crd_rarity = ?`,
                         [body.rarity]);
-                // Selects random card from the array
-                let randomCard = cards[utils.randomNumber(cards.length)];
-                console.log(randomCard);
-                // Add new card to user game card
+                        // Selects random card from the array
+                        let randomCard = cards[utils.randomNumber(cards.length)];
+                        console.log(randomCard);
+                        // Add new card to user game card
                 await pool.query(
                     `Insert into user_game_card
                     (ugc_user_game_id, ugc_crd_id, ugc_state_id)
                     values (?, ?, 1)`,
                         [game.player.id, randomCard.crd_id]);
 
-                // Adjusting player gold
-
-                let [[cost]] = await pool.query(`Select rar_cost as "cost" from crd_rarity where rar_id = ?`, [body.rarity]);
-
-                let [[playerGold]] = await pool.query(`Select ug_gold as "gold" from user_game where ug_id = ?`, [game.player.id]);
-
-                playerGold += cost.cost;
-
-                await pool.query(`Update user_game set ug_gold = ?`, [playerGold]);
- 
                 // Getting the newly created user card id 
                 let [[userCardData]] = await pool.query(
                     `Select max(ugc_id) as "maxID"
@@ -66,7 +72,7 @@ class Card {
                         [game.player.id]);
 
                 let [[cardType]] = await pool.query(
-                    `Select crd_type_id from card, user_game_card
+                    `Select crd_type_id as "type" from card, user_game_card
                     where crd_id = ugc_crd_id and ugc_id = ?`,
                         [userCardData.maxID]);
 
@@ -76,16 +82,16 @@ class Card {
                     (ugh_ugc_id) values (?)`,
                         [userCardData.maxID]);
 
-                if (cardType == 1) {
-                    let [[cardHP]] = await pool.query(
-                    `Select ctk_hp from card_attack, user_game_card
+                if (cardType.type == 1) {
+                    let [[cardDataDB]] = await pool.query(
+                    `Select ctk_hp as "hp", ctk_attack "attack" from card_attack, user_game_card
                     where ugc_crd_id = ctk_crd_id and ugc_id = ?`,
                         [userCardData.maxID]);
 
                     await pool.query(`
                     Insert into user_game_card_attack
-                    (uca_ugc, uca_hp) values (?, ?)`,
-                        [userCardData.maxID, cardHP]);
+                    (uca_ugc_id, uca_hp, uca_ap) values (?, ?, ?)`,
+                        [userCardData.maxID, cardDataDB.hp, cardDataDB.attack]);
                 }
             }
             return { status: 200, result: { msg: "You drew a card." } };
@@ -106,23 +112,23 @@ class Card {
                 }
             }
             else {
-                    let [[ugcID]] = await pool.query(`Select ugh_ugc_id from user_game_hand where ugh_id = ?`, [cardID]);
+                    let [[userCardHandData]] = await pool.query(`Select ugh_ugc_id as "id" from user_game_hand where ugh_id = ?`, [cardID]);
 
                     let [[cardData]] = await pool.query(`
                     Select ugc_crd_id as "id"
                     from user_game_card where ugc_id = ?`,
-                        [ugcID]);
+                        [userCardHandData.id]);
 
                     if (!cardData) {
                         return {status:404, result:{msg:"Please select a valid card."}};
                     }
 
-                    let [[cardType]] = await pool.query(`Select crd_type_id from card where crd_id = ugc_crd_id and ugc_crd_id = ?`, [cardData.id]);
+                    let [[cardType]] = await pool.query(`Select crd_type_id as "typeID" from card, user_game_card where crd_id = ugc_crd_id and ugc_crd_id = ?`, [cardData.id]);
                 
                     await pool.query(`Update user_game_card set ugc_state_id = 2 where ugc_id = ?`, [cardID]);
 
-                    if (cardType == 1) {
-                        this.cardToBoard(boardPos, game);
+                    if (cardType.typeID === 1) {
+                        await this.cardToBoard(cardID, boardPos, game);
                     }
                     
                     await pool.query(`Delete from user_game_hand where ugh_id = ?`, [cardID]);
@@ -136,8 +142,8 @@ class Card {
         }
     }
 
-    static async cardToBoard(boardPos, game) {
-        // let [[cardID]] = await pool.query(`Select max(ugb_id) from user_game_board`);
+    static async cardToBoard(cardID, boardPos, game) {~
+        
         await pool.query(`
         Insert into user_game_board
         (ugb_ugc_id, ugb_position, ugb_ug_id)
@@ -244,7 +250,7 @@ class MatchDecks {
     //         }
     //         return {status:200, result: new MatchDecks(playerCards, oppCards)};
     //     } catch (err) {
-    //         console.log(err);
+    //         (err);
     //         return { status: 500, result: err };
     //     }
     // }
