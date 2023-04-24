@@ -70,7 +70,7 @@ async function requestPlayCard(card, boardPos) {
             });
         return { successful: response.status == 200 };
     } catch (err) {
-        // Treat 500 errors here
+        
         console.log(err);
         return { err: err };
     }

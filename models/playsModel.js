@@ -62,6 +62,11 @@ class Play {
                 }
             }
 
+            [[game.player.gold]] = await pool.query(`Select ug_gold as "gold" from user_game where ug_id = ?`, [game.player.id]);
+            // let newGold = game.player
+            game.player.gold.gold += 4;
+            await pool.query(`Update user_game set ug_gold = ? where ug_id = ?`, [game.player.gold.gold, game.player.id]);
+
             return { status: 200, result: { msg: "Your turn ended." } };
         } catch (err) {
             console.log(err);

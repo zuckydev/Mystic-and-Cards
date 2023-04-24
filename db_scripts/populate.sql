@@ -19,10 +19,10 @@ insert into user_game_state (ugst_state) values ('End');
 
 # -- Game Specific --
 
-insert into rarity (rar_name) values
-    ("Common"),
-    ("Epic"),
-    ("Legendary");
+insert into rarity (rar_name, rar_cost) values
+    ("Common", 4),
+    ("Epic", 6),
+    ("Legendary", 12);
 
 insert into user_game_card_state (ucs_state) values
     ("Hand"),
