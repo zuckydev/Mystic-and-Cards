@@ -75,4 +75,8 @@ function draw() {
     }
 }
 
-async function mouseClicked() {}
+async function mouseClicked() {
+    if ( GameInfo.playerDeck) {
+        GameInfo.playerDeck.click();
+    }
+}

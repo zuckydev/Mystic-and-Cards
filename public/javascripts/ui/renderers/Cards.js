@@ -147,6 +147,8 @@ class PlayerHand {
             for (let card of this.cards) {
                 if (card.click()) {
                     this.clickAction(card.card);
+                    console.log("Card Clicked:");
+                    console.log(card);
                 }
             }
         }

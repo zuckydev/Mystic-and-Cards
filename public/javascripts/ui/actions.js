@@ -60,18 +60,6 @@ async function getBoardInfo() {
     }
 }
 
-// async function getPlayerHandInfo(user) {
-//     let result = await getPlayerHand(user);
-//     if (!result.successful) {
-//         alert("Something is wrong with the game please login again!");
-//         window.location.pathname = "index.html";
-//     } else {
-//         GameInfo.playerHand = result;
-//         if (GameInfo.playerHand) GameInfo.playerHand.update(GameInfo.hand);
-//         else GameInfo.playerHand = new PlayerHand("My Cards", 200, 600, await playCardAction);
-//     }
-// }
-
 async function drawCardAction(deck) {
     let result = await requestDrawCard(deck);
     if (result.successful) {
@@ -94,9 +82,16 @@ async function drawLegendaryCard() {
 }
 
 async function playCardAction(card) {
-    let result = await requestPlayCard(card);
 
-    if (!result.successful) {
-        alert("Something went wrong when playing card.");
+    let boardPos = parseInt(prompt("What position (1, 2, 3)?"));
+    
+    if (position > 4 || position < 1) {
+        alert("Please select a valid position.");
+    } else {
+        let result = await requestPlayCard(card, boardPos);
+        if (!result.successful) {
+            alert("Something went wrong when playing a card");
+        }
     }
+    
 }

@@ -30,6 +30,7 @@ create table user_game (
     ug_state_id int not null,
     ug_gold int not null default 15,
     ug_mine_level int not null default 0,
+    ug_hp int not null default 50,
     primary key (ug_id));
 
 create table user_game_state (
@@ -51,6 +52,7 @@ create table card (
 create table rarity (
     rar_id int not null auto_increment,
     rar_name varchar(60) not null,
+    rar_cost int not null,
     primary key (rar_id));
 
 create table card_attack (
@@ -90,6 +92,7 @@ create table user_game_card_attack (
     uca_id int not null auto_increment,
     uca_ugc_id int not null,
     uca_hp int not null,
+    uca_ap int not null,
     primary key (uca_id));
 
 create table user_game_hand (
@@ -103,7 +106,7 @@ create table user_game_board (
     ugb_id int not null auto_increment,
     ugb_ugc_id int not null,
     ugb_position int not null,
-#   ugb_ug_id int not null,
+    ugb_ug_id int not null,
     primary key (ugb_id));
 
 create table user_game_discard (

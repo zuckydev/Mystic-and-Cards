@@ -16,7 +16,7 @@ class Card {
 
     static async drawCard(game, body) {
         try {
-            let playernCards = await pool.query(`Select count(ugc_id) from user_game_card where ugc_user_game_id = ?`, [game.player.id]);
+            let [[playernCards]] = await pool.query(`Select count(ugc_id) as "num" from user_game_card where ugc_user_game_id = ?`, [game.player.id]);
                 
             if (game.player.state.name == "Waiting") {
                 return {
@@ -25,7 +25,7 @@ class Card {
                             "You cannot draw card since you are not currently on your turn."
                     }
                 }
-            } else if (playernCards > 5) {
+            } else if (playernCards.num > 5) {
                 return {
                     status: 400, result: {
                         msg:
@@ -38,7 +38,6 @@ class Card {
                 let [cards] = await pool.query(
                     `select * from card where crd_rarity = ?`,
                         [body.rarity]);
-                console.log(body.rarity);
                 // Selects random card from the array
                 let randomCard = cards[utils.randomNumber(cards.length)];
                 console.log(randomCard);
@@ -49,8 +48,16 @@ class Card {
                     values (?, ?, 1)`,
                         [game.player.id, randomCard.crd_id]);
 
-                // let [[hp]] = await pool.query(`Select `)
+                // Adjusting player gold
 
+                let [[cost]] = await pool.query(`Select rar_cost as "cost" from crd_rarity where rar_id = ?`, [body.rarity]);
+
+                let [[playerGold]] = await pool.query(`Select ug_gold as "gold" from user_game where ug_id = ?`, [game.player.id]);
+
+                playerGold += cost.cost;
+
+                await pool.query(`Update user_game set ug_gold = ?`, [playerGold]);
+ 
                 // Getting the newly created user card id 
                 let [[userCardData]] = await pool.query(
                     `Select max(ugc_id) as "maxID"
@@ -99,25 +106,26 @@ class Card {
                 }
             }
             else {
+                    let [[ugcID]] = await pool.query(`Select ugh_ugc_id from user_game_hand where ugh_id = ?`, [cardID]);
+
                     let [[cardData]] = await pool.query(`
-                    Select ugc_crd_id as "ID"
+                    Select ugc_crd_id as "id"
                     from user_game_card where ugc_id = ?`,
-                        [cardID]);
+                        [ugcID]);
 
                     if (!cardData) {
                         return {status:404, result:{msg:"Please select a valid card."}};
                     }
 
-                    let [[cardType]] = await pool.query(`Select crd_type_id from card where crd_id = ugc_crd_id and ugc_crd_id = ?`, [cardData.ID]);
-                    // let [[ugID]] = await pool.query(`Select ug_id from user_game where ug_id = ?`, [game.player.id]);
+                    let [[cardType]] = await pool.query(`Select crd_type_id from card where crd_id = ugc_crd_id and ugc_crd_id = ?`, [cardData.id]);
+                
+                    await pool.query(`Update user_game_card set ugc_state_id = 2 where ugc_id = ?`, [cardID]);
+
+                    if (cardType == 1) {
+                        this.cardToBoard(boardPos, game);
+                    }
                     
-                    await pool.query(`
-                    Insert into user_game_board
-                    (ugb_card_id, ugb_position, ugb_ug_id)
-                    values (?, ?, ?)`, 
-                        [cardID, boardPos, game.player.id]);
-                    await pool.query(`Delete from user_game_card where ugc_id = ?`, [cardData]);
-                    // await pool.query(`Update user_game_card set ugc_state_id = 2 where ugc_crd_id = ?`, [cardID]);
+                    await pool.query(`Delete from user_game_hand where ugh_id = ?`, [cardID]);
 
                 }
                 return {status:200, result: {msg: "Card played!"}};
@@ -128,21 +136,43 @@ class Card {
         }
     }
 
-    static async cardAttack(card1, card2) {
-        try {
-            if (game.player.state.name == "Waiting") {
-                return {
-                    status: 400, result: {
-                        msg:
-                            "You cannot play this card since you are not currently on your turn."
-                    }
-                }
+    static async cardToBoard(boardPos, game) {
+        // let [[cardID]] = await pool.query(`Select max(ugb_id) from user_game_board`);
+        await pool.query(`
+        Insert into user_game_board
+        (ugb_ugc_id, ugb_position, ugb_ug_id)
+        values (?, ?, ?)`, 
+            [cardID, boardPos, game.player.id]);
+    }
+
+    static async cardAttack() {
+
+        let [[cardInfo]] = await pool.query(`Select ctk_attack as "ap", ctk_hp as "hp" from card_attack where ctk_crd_id = ?`, [cardData.id]);
+        await pool.query(`Insert into user_game_card_attack(uca_ugc_id, uca_hp, uca_ap) values (?, ?, ?)`, [ugcID, cardInfo.hp, cardInfo.ap]);
+        for (let i = 0; i < game.opponents.length; i++) {
+
+            let [[cardInFront]] = await pool.query(`Select * from user_game_board where ugb_ug_id = ?`, [game.opponents[i]]);
+
+            if (!cardInFront) {
+                let [[oppHP]] = await pool.query(`Select ug_hp from user_game where ug_id = ?`, [game.opponents[i]]);
+                oppHP -= cardInfo.ap;
+                await pool.query(`Update user_game set ug_hp = ?`, [oppHP]);
             } else {
-                let [[cardID]] = await pool.query(`Select ugb_card_id from user_game_board where `);
-                let [[AP]] = await pool.query(`Select ctk_attack from card_attack where ctk_crd_id = ?`, [card1.id]);
+                let [[ugcID]] = await pool.query(`Select ugb_ugc_id from user_game_board where ugb_ug_id = ?`, [game.opponents[i]]);
+                let [[cardInFrontData]] = await pool.query(`Select uca_hp as "hp" from user_game_card_attack where uca_ugc_id = ?`, [ugcID]);
+                // let [[CardInFrontID]] = await pool.query(`Select ugc_crd_id from user_game_card where ugc_id = ?`, [ugcID]);
+                // let [[cardInFrontData]] = (`Select ctk_hp as "hp" from card_attack where ctk_crd_id = ?`, [CardInFrontID]);
+
+                cardInFrontData.hp -= cardInfo.ap;
+                
+                if (cardInFront.hp > 0) {
+                    await pool.query(`Update user_game_card_attack set uca_hp = ?`, [cardInFront.hp]);
+                }
+                else {
+                    await pool.query(`Insert into user_game_discard(ugd_ugc_id) value (?)`, [ugcID]);
+                    await pool.query(`Delete from user_game_board where ugb_ugc_id = ?`, [ugcID]);
+                }
             }
-        } catch (error) {
-            
         }
     }
 
