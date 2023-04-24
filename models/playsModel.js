@@ -153,9 +153,12 @@ class Play {
         }
 
         [playerInfo.board] = await pool.query(
-            `Select *
-            from user_game_card, user_game_board
-            where ugc_id = ugb_ugc_id and ugc_user_game_id = ?`,
+            `Select ugc_id as "id", ugc_crd_id as "cardID", ugc_user_game_id as "owner", ugb_id as "boardID", crd_name as "name", crd_rarity as "rarity",
+            crd_type_id as "type",
+            ugc_state_id as "state",
+            uca_hp as "hp",
+            uca_ap as "attack" from user_game_card, user_game_board, card, user_game_card_attack
+            where ugc_id = ugb_ugc_id and ugc_crd_id = crd_id and uca_ugc_id = ugc_id and ugc_user_game_id = ?`,
             [userId]);
 
         [playerInfo.discard] = await pool.query(
@@ -163,8 +166,6 @@ class Play {
             from user_game_card, user_game_discard
             where ugc_id = ugd_ugc_id and ugc_user_game_id = ?`,
             [userId]);
-
-        console.log(playerInfo);
         
         return playerInfo
     }
