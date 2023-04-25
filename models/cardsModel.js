@@ -149,6 +149,9 @@ class Card {
                         values (?, ?, ?)`, 
                             [cardID, cardInfo.hp, cardInfo.ap]);
                     }
+                    else if (cardType.typeID === 3) {
+                        await this.cardSpell(cardID, boardPos);
+                    }
                     
                     await pool.query(`Delete from user_game_hand where ugh_id = ?`, [cardID]);
 
@@ -171,10 +174,6 @@ class Card {
     }
 
     static async cardAttack(cardID, boardPos, opponents) {
-
-        console.log("Attack: ");
-        console.log(cardID);
-        console.log(boardPos);
         
         for (let i = 0; i < opponents.length; i++) {
 
@@ -210,7 +209,8 @@ class Card {
                     await pool.query(`
                     Update user_game_card_attack 
                     set uca_hp = ? 
-                    where uca_ugc_id = ?`, [cardInFrontData.hp, cardInFront.ugcID]);
+                    where uca_ugc_id = ?`,
+                        [cardInFrontData.hp, cardInFront.ugcID]);
                 }
                 else {
                     // adds the card to the discard table
@@ -229,7 +229,7 @@ class Card {
         }
     }
 
-    static async cardSpell(card, oppBoard) {
+    static async cardSpell(cardID, boardPos) {
         try {
             if (game.player.state.name == "Waiting") {
                 return {
@@ -239,7 +239,50 @@ class Card {
                     }
                 }
             } else {
-                
+                let[[buffedCard]] = await pool.query(`
+                Select ugb_ugc_id as "ugcID"
+                from user_game_board
+                where ugb_position = ? 
+                and ugb_ug_id = ?`, 
+                    [boardPos, game.player.id]);
+
+                    if (!buffedCard) {
+                        return {
+                            status: 400, result: {
+                                msg:
+                                    "Please choose a card."
+                            }
+                        }
+                    }
+                    else {
+
+                        // needs optimization
+                        let [[ugcID]] = await pool.query(`
+                        Select ugh_ugc_id as "id" from user_game_hand
+                        where ugh_id = ?`, 
+                            [cardID]);
+
+                        let [[crdID]] = await pool.query(`
+                        Select ugc_crd_id as "id" from user_game_card
+                        where ugc_id = ?`, 
+                            [ugcID.id]);
+
+                        let [[buff]] = await pool.query(`
+                        Select csp_attack as "ap" 
+                        from card_spell 
+                        where csp_crd_id =  ? `, [crdID.id]);
+
+                        let [[buffedCardData]] = (`
+                        Select uca_ap as "ap" from user_game_card_attack where uca_ugc_id = ?`,
+                            [buffedCard.ugcID]);
+
+                        buffedCardData.ap += buff.ap;
+
+                        await pool.query(`Update user_game_card_attack set uca_ap = ?`,
+                            [buffedCardData.ap]);
+
+                    }
+
             }
         } catch (error) {
             
@@ -256,7 +299,8 @@ class Card {
                     }
                 }
             } else {
-
+                let [[crdID]] = await pool.query(`
+                `);
             }
         } catch (error) {
             
