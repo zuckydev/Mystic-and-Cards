@@ -79,7 +79,6 @@ class Play {
                 }
             }
 
-
             [[game.player.gold]] = await pool.query(`Select ug_gold as "gold" from user_game where ug_id = ?`, [game.player.id]);
             // let newGold = game.player
             game.player.gold.gold += 4;
@@ -180,7 +179,8 @@ class Play {
             crd_type_id as "type",
             ugc_state_id as "state",
             uca_hp as "hp",
-            uca_ap as "attack" 
+            uca_ap as "attack", 
+            ugb_position as "position"
             from user_game_card, user_game_board, card, user_game_card_attack
             where ugc_id = ugb_ugc_id 
             and ugc_crd_id = crd_id 

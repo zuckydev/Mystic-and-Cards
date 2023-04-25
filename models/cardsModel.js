@@ -50,51 +50,57 @@ class Card {
                 else {
                     // Ajusts player gold
                     playerGold.gold -= cost.cost;
-                    await pool.query(`Update user_game set ug_gold = ? where ug_id = ?`, [playerGold.gold, game.player.id]);
+                    await pool.query(`Update user_game 
+                    set ug_gold = ? 
+                    where ug_id = ?`, 
+                        [playerGold.gold, game.player.id]);
+
                     // Selects all cards from that rarity
                     let [cards] = await pool.query(
-                        `select * from card where crd_rarity = ?`,
-                        [body.rarity]);
-                        // Selects random card from the array
-                        let randomCard = cards[utils.randomNumber(cards.length)];
-                        console.log(randomCard);
-                        // Add new card to user game card
-                await pool.query(
+                    `select * from card where crd_rarity = ?`,
+                    [body.rarity]);
+
+                    // Selects random card from the array
+                    let randomCard = cards[utils.randomNumber(cards.length)];
+                    console.log(randomCard);
+                    
+                    // Add new card to user game card
+                    await pool.query(
                     `Insert into user_game_card
                     (ugc_user_game_id, ugc_crd_id, ugc_state_id)
                     values (?, ?, 1)`,
                         [game.player.id, randomCard.crd_id]);
 
-                // Getting the newly created user card id 
-                let [[userCardData]] = await pool.query(
-                    `Select max(ugc_id) as "maxID"
-                    from user_game_card 
-                    where ugc_user_game_id = ?`,
-                        [game.player.id]);
+                    // Getting the newly created user card id 
+                    let [[userCardData]] = await pool.query(
+                        `Select max(ugc_id) as "maxID"
+                        from user_game_card 
+                        where ugc_user_game_id = ?`,
+                            [game.player.id]);
 
-                let [[cardType]] = await pool.query(
-                    `Select crd_type_id as "type" from card, user_game_card
-                    where crd_id = ugc_crd_id and ugc_id = ?`,
-                        [userCardData.maxID]);
+                    let [[cardType]] = await pool.query(
+                        `Select crd_type_id as "type" from card, user_game_card
+                        where crd_id = ugc_crd_id and ugc_id = ?`,
+                            [userCardData.maxID]);
 
-                // Add the newly created card to the hand
-                await pool.query(
-                    `Insert into user_game_hand
-                    (ugh_ugc_id) values (?)`,
-                        [userCardData.maxID]);
+                    // Add the newly created card to the hand
+                    await pool.query(
+                        `Insert into user_game_hand
+                        (ugh_ugc_id) values (?)`,
+                            [userCardData.maxID]);
 
-                if (cardType.type == 1) {
-                    let [[cardDataDB]] = await pool.query(
-                    `Select ctk_hp as "hp", ctk_attack "attack" from card_attack, user_game_card
-                    where ugc_crd_id = ctk_crd_id and ugc_id = ?`,
-                        [userCardData.maxID]);
+                    if (cardType.type == 1) {
+                        let [[cardDataDB]] = await pool.query(
+                        `Select ctk_hp as "hp", ctk_attack "attack" from card_attack, user_game_card
+                        where ugc_crd_id = ctk_crd_id and ugc_id = ?`,
+                            [userCardData.maxID]);
 
-                    await pool.query(`
-                    Insert into user_game_card_attack
-                    (uca_ugc_id, uca_hp, uca_ap) values (?, ?, ?)`,
-                        [userCardData.maxID, cardDataDB.hp, cardDataDB.attack]);
+                        await pool.query(`
+                        Insert into user_game_card_attack
+                        (uca_ugc_id, uca_hp, uca_ap) values (?, ?, ?)`,
+                            [userCardData.maxID, cardDataDB.hp, cardDataDB.attack]);
+                    }
                 }
-            }
             return { status: 200, result: { msg: "You drew a card." } };
         } catch (err) {
             console.log(err);
@@ -130,6 +136,18 @@ class Card {
 
                     if (cardType.typeID === 1) {
                         await this.cardToBoard(cardID, boardPos, game);
+
+                        let [[cardInfo]] = await pool.query(`
+                        Select distinct(ctk_attack) as "ap", ctk_hp as "hp" 
+                        from card_attack, user_game_card
+                        where ctk_crd_id = ugc_crd_id and ugc_id = ?`, 
+                            [cardID]);
+                    
+                        await pool.query(`
+                        Insert into user_game_card_attack
+                        (uca_ugc_id, uca_hp, uca_ap) 
+                        values (?, ?, ?)`, 
+                            [cardID, cardInfo.hp, cardInfo.ap]);
                     }
                     
                     await pool.query(`Delete from user_game_hand where ugh_id = ?`, [cardID]);
@@ -153,20 +171,19 @@ class Card {
     }
 
     static async cardAttack(cardID, boardPos, opponents) {
+
+        console.log("Attack: ");
+        console.log(cardID);
+        console.log(boardPos);
         
-        let [[cardInfo]] = await pool.query(`
-        Select distinct(ctk_attack) as "ap", ctk_hp as "hp" 
-        from card_attack, user_game_card
-        where ctk_crd_id = ugc_crd_id and ugc_id = ?`, 
-            [cardID]);
-
-        await pool.query(`
-        Insert into user_game_card_attack
-        (uca_ugc_id, uca_hp, uca_ap) 
-        values (?, ?, ?)`, 
-            [cardID, cardInfo.hp, cardInfo.ap]);
-
         for (let i = 0; i < opponents.length; i++) {
+
+            let [[attackPower]] = await pool.query(`
+            Select uca_ap as "ap" 
+            from user_game_card_attack 
+            where uca_ugc_id = ?`, 
+                [cardID]);
+
             let [[cardInFront]] = await pool.query(`
             Select ugb_ugc_id as "ugcID" 
             from user_game_board 
@@ -179,7 +196,7 @@ class Card {
                 where ug_id = ?`, 
                     [opponents[i].id]);
 
-                oppHP.hp -= cardInfo.ap;
+                oppHP.hp -= attackPower.ap;
                 await pool.query(`Update user_game set ug_hp = ? where ug_id = ?`, [oppHP.hp, opponents[i].id]);
             } else {
                     
@@ -187,10 +204,13 @@ class Card {
                 from user_game_card_attack where uca_ugc_id = ?`,
                     [cardInFront.ugcID]);
 
-                cardInFrontData.hp -= cardInfo.ap;
+                cardInFrontData.hp -= attackPower.ap;
                 
                 if (cardInFrontData.hp > 0) {
-                    await pool.query(`Update user_game_card_attack set uca_hp = ?`, [cardInFrontData.hp]);
+                    await pool.query(`
+                    Update user_game_card_attack 
+                    set uca_hp = ? 
+                    where uca_ugc_id = ?`, [cardInFrontData.hp, cardInFront.ugcID]);
                 }
                 else {
                     // adds the card to the discard table
@@ -198,12 +218,12 @@ class Card {
                     Insert into user_game_discard
                     (ugd_ugc_id) 
                     value (?)`, 
-                        [cardID]);
+                        [cardInFront.ugcID]);
 
                     // deletes it from the board table
                     await pool.query(`Delete from user_game_board 
                     where ugb_ugc_id = ?`, 
-                        [cardID]);
+                        [cardInFront.ugcID]);
                 }
             }
         }
