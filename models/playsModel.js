@@ -1,4 +1,5 @@
 const pool = require("../config/database");
+const Card = require("./cardsModel");
 
 // auxiliary function to check if the game ended 
 async function checkEndGame(game) {
@@ -62,6 +63,23 @@ class Play {
                 }
             }
 
+            let [cardsOnBoard] = await pool.query(`
+            Select ugb_ugc_id as "id", 
+            ugb_position as "position"
+            from user_game_board
+            where ugb_ug_id = ?`, 
+                [game.player.id]);
+
+            if (cardsOnBoard) {
+                for (let i = 0; i < cardsOnBoard.length; i++) {
+                    if (cardsOnBoard[i].id) {
+                        await Card.cardAttack(cardsOnBoard[i].id, cardsOnBoard[i].position, game.opponents);
+                    }
+                    
+                }
+            }
+
+
             [[game.player.gold]] = await pool.query(`Select ug_gold as "gold" from user_game where ug_id = ?`, [game.player.id]);
             // let newGold = game.player
             game.player.gold.gold += 4;
@@ -110,7 +128,7 @@ class Play {
     static async getUserBoardInfo(userId, gameId) {
 
         let [[playerInfo]] = await pool.query(`
-        select ug_gold as "gold", ug_mine_level as "mineLevel"
+        select ug_gold as "gold", ug_mine_level as "mineLevel", ug_hp as "hp"
         from user_game
         where ug_game_id = ? and ug_user_id = ?`,
             [gameId, userId]);
@@ -153,13 +171,22 @@ class Play {
         }
 
         [playerInfo.board] = await pool.query(
-            `Select ugc_id as "id", ugc_crd_id as "cardID", ugc_user_game_id as "owner", ugb_id as "boardID", crd_name as "name", crd_rarity as "rarity",
+            `Select distinct(ugc_id) as "id", 
+            ugc_crd_id as "cardID", 
+            ugc_user_game_id as "owner", 
+            ugb_id as "boardID", 
+            crd_name as "name", 
+            crd_rarity as "rarity",
             crd_type_id as "type",
             ugc_state_id as "state",
             uca_hp as "hp",
-            uca_ap as "attack" from user_game_card, user_game_board, card, user_game_card_attack
-            where ugc_id = ugb_ugc_id and ugc_crd_id = crd_id and uca_ugc_id = ugc_id and ugc_user_game_id = ?`,
-            [userId]);
+            uca_ap as "attack" 
+            from user_game_card, user_game_board, card, user_game_card_attack
+            where ugc_id = ugb_ugc_id 
+            and ugc_crd_id = crd_id 
+            and uca_ugc_id = ugc_id 
+            and ugc_user_game_id = ?`,
+                [userId]);
 
         [playerInfo.discard] = await pool.query(
             `Select *

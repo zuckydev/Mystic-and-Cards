@@ -98,8 +98,6 @@ create table user_game_card_attack (
 create table user_game_hand (
     ugh_id int not null auto_increment,
     ugh_ugc_id int not null, 
-#   ugh_position int not null,
-#   ugh_ug_id int not null,
     primary key (ugh_id));
 
 create table user_game_board (

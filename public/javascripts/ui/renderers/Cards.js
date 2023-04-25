@@ -105,7 +105,7 @@ class PlayerHand {
     static nCards = 5;
     static titleHeight = 50;
 
-    constructor(title, cardsInfo, x, y, clickAction, cardSpacing, scale) {
+    constructor(title, cardsInfo, x, y, clickAction, cardSpacing) {
         this.title = title;
         this.x = x;
         this.y = y;
@@ -115,8 +115,10 @@ class PlayerHand {
         this.scale = scale;
         this.cards = this.createCards(cardsInfo);
     }
-
+    
     createCards(cardsInfo) {
+        console.log("cards info: ")
+        console.log(cardsInfo)
         let cards = [];
         for (let cardInfo of cardsInfo) {
             // cards.push(new Card(cardInfo.id, cardInfo.name, cardInfo.rarity, cardInfo.type, cardInfo.state));

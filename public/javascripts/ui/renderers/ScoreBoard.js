@@ -11,7 +11,7 @@ class ScoreBoard {
     draw() {
         fill(255,230,0);
         stroke(0, 0, 0);
-        rect(ScoreBoard.x, ScoreBoard.y, ScoreBoard.width, ScoreBoard.height + 20, 5, 5, 5, 5);
+        rect(ScoreBoard.x, ScoreBoard.y, ScoreBoard.width, ScoreBoard.height + 40, 5, 5, 5, 5);
         fill(0, 0, 0);
         textAlign(LEFT, CENTER);
         textSize(16);
@@ -21,7 +21,9 @@ class ScoreBoard {
         text("Opponent: " + this.game.opponents[0].name, ScoreBoard.x + 10, ScoreBoard.y + 3 * ScoreBoard.height / 4);
         text(`(${this.game.player.state})`, ScoreBoard.x + 200, ScoreBoard.y + 2 * ScoreBoard.height / 4);
         text(`(${this.game.opponents[0].state})`, ScoreBoard.x + 200, ScoreBoard.y + 3 * ScoreBoard.height / 4);
-        text("Player Gold: " + this.board.player.gold, ScoreBoard.x + 10, ScoreBoard.y + 4 * ScoreBoard.height / 4);
+        text("Player HP: " + this.board.player.hp, ScoreBoard.x + 10, ScoreBoard.y + 4 * ScoreBoard.height / 4);
+        text("Player Gold: " + this.board.player.gold, ScoreBoard.x + 10, ScoreBoard.y + 5 * ScoreBoard.height / 4);
+
         if (this.game.state == "Finished") {
             fill(200, 0, 0);
             textSize(24);

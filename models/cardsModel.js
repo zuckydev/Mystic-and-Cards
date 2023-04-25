@@ -6,12 +6,13 @@ const utils = require("../config/utils");
 // }
 
 class Card {
-    constructor(cardId, deckId, name, type, state) {
+    constructor(cardId, deckId, name, type, state, userCardHandData) {
         this.cardId = cardId;
         this.deckId = deckId;
         this.name = name;
         this.type = type;
         this.state = state;
+        this.userCardHandData = userCardHandData;
     }
 
     static async drawCard(game, body) {
@@ -112,12 +113,12 @@ class Card {
                 }
             }
             else {
-                    let [[userCardHandData]] = await pool.query(`Select ugh_ugc_id as "id" from user_game_hand where ugh_id = ?`, [cardID]);
+                    [[this.userCardHandData]] = await pool.query(`Select ugh_ugc_id as "id" from user_game_hand where ugh_id = ?`, [cardID]);
 
                     let [[cardData]] = await pool.query(`
                     Select ugc_crd_id as "id"
                     from user_game_card where ugc_id = ?`,
-                        [userCardHandData.id]);
+                        [this.userCardHandData.id]);
 
                     if (!cardData) {
                         return {status:404, result:{msg:"Please select a valid card."}};
@@ -151,32 +152,58 @@ class Card {
             [cardID, boardPos, game.player.id]);
     }
 
-    static async cardAttack() {
+    static async cardAttack(cardID, boardPos, opponents) {
+        
+        let [[cardInfo]] = await pool.query(`
+        Select distinct(ctk_attack) as "ap", ctk_hp as "hp" 
+        from card_attack, user_game_card
+        where ctk_crd_id = ugc_crd_id and ugc_id = ?`, 
+            [cardID]);
 
-        let [[cardInfo]] = await pool.query(`Select ctk_attack as "ap", ctk_hp as "hp" from card_attack where ctk_crd_id = ?`, [cardData.id]);
-        await pool.query(`Insert into user_game_card_attack(uca_ugc_id, uca_hp, uca_ap) values (?, ?, ?)`, [ugcID, cardInfo.hp, cardInfo.ap]);
-        for (let i = 0; i < game.opponents.length; i++) {
+        await pool.query(`
+        Insert into user_game_card_attack
+        (uca_ugc_id, uca_hp, uca_ap) 
+        values (?, ?, ?)`, 
+            [cardID, cardInfo.hp, cardInfo.ap]);
 
-            let [[cardInFront]] = await pool.query(`Select * from user_game_board where ugb_ug_id = ?`, [game.opponents[i]]);
-
+        for (let i = 0; i < opponents.length; i++) {
+            let [[cardInFront]] = await pool.query(`
+            Select ugb_ugc_id as "ugcID" 
+            from user_game_board 
+            where ugb_ug_id = ? and ugb_position = ?`, 
+                [opponents[i].id, boardPos]);
+                
             if (!cardInFront) {
-                let [[oppHP]] = await pool.query(`Select ug_hp from user_game where ug_id = ?`, [game.opponents[i]]);
-                oppHP -= cardInfo.ap;
-                await pool.query(`Update user_game set ug_hp = ?`, [oppHP]);
+                let [[oppHP]] = await pool.query(`
+                Select ug_hp as "hp" from user_game 
+                where ug_id = ?`, 
+                    [opponents[i].id]);
+
+                oppHP.hp -= cardInfo.ap;
+                await pool.query(`Update user_game set ug_hp = ? where ug_id = ?`, [oppHP.hp, opponents[i].id]);
             } else {
-                let [[ugcID]] = await pool.query(`Select ugb_ugc_id from user_game_board where ugb_ug_id = ?`, [game.opponents[i]]);
-                let [[cardInFrontData]] = await pool.query(`Select uca_hp as "hp" from user_game_card_attack where uca_ugc_id = ?`, [ugcID]);
-                // let [[CardInFrontID]] = await pool.query(`Select ugc_crd_id from user_game_card where ugc_id = ?`, [ugcID]);
-                // let [[cardInFrontData]] = (`Select ctk_hp as "hp" from card_attack where ctk_crd_id = ?`, [CardInFrontID]);
+                    
+                let [[cardInFrontData]] = await pool.query(`Select uca_hp as "hp" 
+                from user_game_card_attack where uca_ugc_id = ?`,
+                    [cardInFront.ugcID]);
 
                 cardInFrontData.hp -= cardInfo.ap;
                 
-                if (cardInFront.hp > 0) {
-                    await pool.query(`Update user_game_card_attack set uca_hp = ?`, [cardInFront.hp]);
+                if (cardInFrontData.hp > 0) {
+                    await pool.query(`Update user_game_card_attack set uca_hp = ?`, [cardInFrontData.hp]);
                 }
                 else {
-                    await pool.query(`Insert into user_game_discard(ugd_ugc_id) value (?)`, [ugcID]);
-                    await pool.query(`Delete from user_game_board where ugb_ugc_id = ?`, [ugcID]);
+                    // adds the card to the discard table
+                    await pool.query(`
+                    Insert into user_game_discard
+                    (ugd_ugc_id) 
+                    value (?)`, 
+                        [cardID]);
+
+                    // deletes it from the board table
+                    await pool.query(`Delete from user_game_board 
+                    where ugb_ugc_id = ?`, 
+                        [cardID]);
                 }
             }
         }
@@ -192,7 +219,7 @@ class Card {
                     }
                 }
             } else {
-
+                
             }
         } catch (error) {
             
@@ -257,4 +284,3 @@ class MatchDecks {
 }
 
 module.exports = Card;
-// module.exports = MatchDecks;

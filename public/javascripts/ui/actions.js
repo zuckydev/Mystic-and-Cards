@@ -49,16 +49,17 @@ async function getBoardInfo() {
             
         } 
         else {
-            GameInfo.playerHand = new PlayerHand ("Player Cards", GameInfo.board.player.hand, 100, 450, playCardAction, 5, 1);
+            GameInfo.playerHand = new PlayerHand ("Player Cards", GameInfo.board.player.hand, 100, 450, playCardAction);
         }
         if (GameInfo.playerBoard) {
             GameInfo.playerBoard.update(GameInfo.board.player.board);
         }
         else {
-            GameInfo.playerBoard = new PlayerHand ("Board Cards", GameInfo.board.player.board, 100, 300, null, 10, 2);
+            GameInfo.playerBoard = new PlayerHand ("Board Cards", GameInfo.board.player.board, 100, 300, null);
         }
 
         for (let i = 0; i < GameInfo.board.opponents.length; i++) {
+            
             if (GameInfo.oppHand) {
                 GameInfo.oppHand.update(GameInfo.board.opponents[i].hand);
             } else {
@@ -68,7 +69,7 @@ async function getBoardInfo() {
             if (GameInfo.oppBoard) {
                 GameInfo.oppBoard.update(GameInfo.board.opponents[i].board);
             } else {
-                GameInfo.oppBoard= new PlayerHand ("Opponent Board Cards", GameInfo.board.opponents[i].board, 100, 170, playCardAction);
+                GameInfo.oppBoard = new PlayerHand ("Opponent Board Cards", GameInfo.board.opponents[i].board, 100, 170, null);
             }
 
 
