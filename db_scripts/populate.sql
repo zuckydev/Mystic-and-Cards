@@ -39,7 +39,7 @@ insert into card (crd_name, crd_rarity, crd_type_id) values
     ("Reaper", 2, 1),
     ("Golem", 2, 1),
     ("Hydra", 3, 1),
-    ("Demon", 3, 1);
+    ("Demon", 3, 1),
 
 #    ("Wood Shield", 1, 2),
 #    ("Wind Barrier", 1, 2),
@@ -49,12 +49,12 @@ insert into card (crd_name, crd_rarity, crd_type_id) values
 #    ("Holy Protector", 3, 2),
 #    ("Demon's King Guard", 3, 2),
 
-#    ("Iceball", 1, 3),
-#    ("Fireball", 1, 3),
-#    ("Wind Blade", 1, 3),
-#    ("Poison Cloud", 2, 3),
-#    ("Thunderbolt", 2, 3),
-#    ("Meteor", 3, 3);
+    ("Iceball", 1, 3),
+    ("Fireball", 1, 3),
+    ("Wind Blade", 1, 3),
+    ("Poison Cloud", 2, 3),
+    ("Thunderbolt", 2, 3),
+    ("Meteor", 3, 3);
 
 
 insert into card_attack (ctk_attack, ctk_hp, ctk_crd_id) values
@@ -78,10 +78,12 @@ insert into card_attack (ctk_attack, ctk_hp, ctk_crd_id) values
 #    (7, 16),
 #    (7, 17);
 
-#insert into card_spell (csp_attack, csp_crd_id) values
-#    (1, 18),
-#    (2, 19),
-#    (3, 20),
-#    (4, 21),
-#    (6, 22),
-#    (8, 23);
+insert into card_spell (csp_attack, csp_crd_id) values
+    (1, 11),
+    (2, 12),
+    (3, 13),
+    (4, 14),
+    (6, 15),
+    (8, 16);
+
+# fake games

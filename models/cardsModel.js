@@ -110,6 +110,11 @@ class Card {
 
     static async playCard(game, cardID, boardPos) {
         try {
+            let [[cardInPlace]] = await pool.query(`
+            Select * from user_game_board 
+            where ugb_ug_id = ? and ugb_position = ?`, 
+                [game.player.id, boardPos]);
+
             if (game.player.state.name == "Waiting") {
                 return {
                     status: 400, result: {
@@ -118,8 +123,19 @@ class Card {
                     }
                 }
             }
+            // else if (cardInPlace) {
+            //     return {
+            //         status: 400, result: {
+            //             msg:
+            //                 "You cannot play a card in this position."
+            //         }
+            //     }
+            // }
             else {
-                    [[this.userCardHandData]] = await pool.query(`Select ugh_ugc_id as "id" from user_game_hand where ugh_id = ?`, [cardID]);
+                    [[this.userCardHandData]] = await pool.query(`
+                        Select ugh_ugc_id as "id" 
+                        from user_game_hand where ugh_id = ?`, 
+                            [cardID]);
 
                     let [[cardData]] = await pool.query(`
                     Select ugc_crd_id as "id"
@@ -130,10 +146,15 @@ class Card {
                         return {status:404, result:{msg:"Please select a valid card."}};
                     }
 
-                    let [[cardType]] = await pool.query(`Select crd_type_id as "typeID" from card, user_game_card where crd_id = ugc_crd_id and ugc_crd_id = ?`, [cardData.id]);
-                
+                    let [[cardType]] = await pool.query(`
+                        Select crd_type_id as "typeID" 
+                        from card, user_game_card 
+                        where crd_id = ugc_crd_id and ugc_crd_id = ?`, 
+                            [cardData.id]);
+                    // changes state of the card to on-hand
                     await pool.query(`Update user_game_card set ugc_state_id = 2 where ugc_id = ?`, [cardID]);
 
+                    // monster card
                     if (cardType.typeID === 1) {
                         await this.cardToBoard(cardID, boardPos, game);
 
@@ -149,8 +170,9 @@ class Card {
                         values (?, ?, ?)`, 
                             [cardID, cardInfo.hp, cardInfo.ap]);
                     }
+                    // spell card
                     else if (cardType.typeID === 3) {
-                        await this.cardSpell(cardID, boardPos);
+                        await this.cardSpell(cardID, boardPos, game);
                     }
                     
                     await pool.query(`Delete from user_game_hand where ugh_id = ?`, [cardID]);
@@ -164,7 +186,7 @@ class Card {
         }
     }
 
-    static async cardToBoard(cardID, boardPos, game) {~
+    static async cardToBoard(cardID, boardPos, game) {
         
         await pool.query(`
         Insert into user_game_board
@@ -229,7 +251,7 @@ class Card {
         }
     }
 
-    static async cardSpell(cardID, boardPos) {
+    static async cardSpell(cardID, boardPos, game) {
         try {
             if (game.player.state.name == "Waiting") {
                 return {
@@ -250,7 +272,7 @@ class Card {
                         return {
                             status: 400, result: {
                                 msg:
-                                    "Please choose a card."
+                                    "Please choose a valid card."
                             }
                         }
                     }
@@ -270,22 +292,29 @@ class Card {
                         let [[buff]] = await pool.query(`
                         Select csp_attack as "ap" 
                         from card_spell 
-                        where csp_crd_id =  ? `, [crdID.id]);
+                        where csp_crd_id =  ? `, 
+                            [crdID.id]);
 
-                        let [[buffedCardData]] = (`
-                        Select uca_ap as "ap" from user_game_card_attack where uca_ugc_id = ?`,
+                        console.log(buffedCard.ugcID)
+
+                        let [buffedCardData] = (`
+                        Select distinct uca_ap as "ap" from user_game_card_attack where uca_ugc_id = ?`,
                             [buffedCard.ugcID]);
 
                         buffedCardData.ap += buff.ap;
+                        // console.log(buffedCardData.ap);
+                        // console.log("Buff");
+                        // console.log(buff.ap);
 
-                        await pool.query(`Update user_game_card_attack set uca_ap = ?`,
-                            [buffedCardData.ap]);
 
+                        await pool.query(`Update user_game_card_attack set uca_ap = ? where uca_ugc_id = ?`,
+                            [buffedCardData.ap, buffedCard.ugcID]);
                     }
 
             }
-        } catch (error) {
-            
+        } catch (err) {
+            console.log(err);
+            return { status: 500, result: err };
         }
     }
 
@@ -302,7 +331,7 @@ class Card {
                 let [[crdID]] = await pool.query(`
                 `);
             }
-        } catch (error) {
+        } catch (err) {
             
         }
     }
