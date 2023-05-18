@@ -113,7 +113,27 @@ class Card {
             let [[cardInPlace]] = await pool.query(`
             Select * from user_game_board 
             where ugb_ug_id = ? and ugb_position = ?`, 
-                [game.player.id, boardPos]);
+            [game.player.id, boardPos]);
+            
+            [[this.userCardHandData]] = await pool.query(`
+                Select ugh_ugc_id as "id" 
+                from user_game_hand where ugh_id = ?`, 
+                    [cardID]);
+
+            let [[cardData]] = await pool.query(`
+            Select ugc_crd_id as "id"
+            from user_game_card where ugc_id = ?`,
+                [this.userCardHandData.id]);
+
+            if (!cardData) {
+                return {status:404, result:{msg:"Please select a valid card."}};
+            }
+
+            let [[cardType]] = await pool.query(`
+                Select crd_type_id as "typeID" 
+                from card, user_game_card 
+                where crd_id = ugc_crd_id and ugc_crd_id = ?`, 
+                    [cardData.id]);
 
             if (game.player.state.name == "Waiting") {
                 return {
@@ -123,34 +143,16 @@ class Card {
                     }
                 }
             }
-            // else if (cardInPlace) {
-            //     return {
-            //         status: 400, result: {
-            //             msg:
-            //                 "You cannot play a card in this position."
-            //         }
-            //     }
-            // }
-            else {
-                    [[this.userCardHandData]] = await pool.query(`
-                        Select ugh_ugc_id as "id" 
-                        from user_game_hand where ugh_id = ?`, 
-                            [cardID]);
-
-                    let [[cardData]] = await pool.query(`
-                    Select ugc_crd_id as "id"
-                    from user_game_card where ugc_id = ?`,
-                        [this.userCardHandData.id]);
-
-                    if (!cardData) {
-                        return {status:404, result:{msg:"Please select a valid card."}};
+            else if (cardInPlace && cardType.typeID == 1) {
+                return {
+                    status: 400, result: {
+                        msg:
+                            "You cannot play a card in this position."
                     }
+                }
+            }
+            else {
 
-                    let [[cardType]] = await pool.query(`
-                        Select crd_type_id as "typeID" 
-                        from card, user_game_card 
-                        where crd_id = ugc_crd_id and ugc_crd_id = ?`, 
-                            [cardData.id]);
                     // changes state of the card to on-hand
                     await pool.query(`Update user_game_card set ugc_state_id = 2 where ugc_id = ?`, [cardID]);
 
@@ -279,7 +281,6 @@ class Card {
                     else {
 
                         // needs optimization
-                        // console.log(cardID)
                         let [[ugcID]] = await pool.query(`
                         Select ugh_ugc_id as "id" from user_game_hand
                         where ugh_id = ?`, 
