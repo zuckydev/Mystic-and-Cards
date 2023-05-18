@@ -279,6 +279,7 @@ class Card {
                     else {
 
                         // needs optimization
+                        // console.log(cardID)
                         let [[ugcID]] = await pool.query(`
                         Select ugh_ugc_id as "id" from user_game_hand
                         where ugh_id = ?`, 
@@ -289,24 +290,22 @@ class Card {
                         where ugc_id = ?`, 
                             [ugcID.id]);
 
+                        // console.log(crdID.id)
+
                         let [[buff]] = await pool.query(`
-                        Select csp_attack as "ap" 
+                        Select csp_attack 
                         from card_spell 
-                        where csp_crd_id =  ? `, 
+                        where csp_crd_id =  ?`, 
                             [crdID.id]);
 
-                        console.log(buffedCard.ugcID)
+                        // console.log(buffedCard.ugcID)
 
-                        let [buffedCardData] = (`
+                        let [[buffedCardData]] = await pool.query(`
                         Select distinct uca_ap as "ap" from user_game_card_attack where uca_ugc_id = ?`,
                             [buffedCard.ugcID]);
 
-                        buffedCardData.ap += buff.ap;
-                        // console.log(buffedCardData.ap);
-                        // console.log("Buff");
-                        // console.log(buff.ap);
-
-
+                        buffedCardData.ap += buff.csp_attack;
+                        
                         await pool.query(`Update user_game_card_attack set uca_ap = ? where uca_ugc_id = ?`,
                             [buffedCardData.ap, buffedCard.ugcID]);
                     }
