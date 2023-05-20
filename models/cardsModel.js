@@ -370,7 +370,8 @@ class Card {
                     }
             }
         } catch (err) {
-            
+            console.log(err);
+            return { status: 500, result: err };
         }
     }
 }
