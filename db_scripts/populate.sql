@@ -41,20 +41,20 @@ insert into card (crd_name, crd_rarity, crd_type_id) values
     ("Hydra", 3, 1),
     ("Demon", 3, 1),
 
-#    ("Wood Shield", 1, 2),
-#    ("Wind Barrier", 1, 2),
-#    ("Knight's Shield", 1, 2),
-#    ("Steel Prison", 2, 2),
-#    ("Diamond Wall", 2, 2),
-#    ("Holy Protector", 3, 2),
-#    ("Demon's King Guard", 3, 2),
-
     ("Iceball", 1, 3),
     ("Fireball", 1, 3),
     ("Wind Blade", 1, 3),
     ("Poison Cloud", 2, 3),
     ("Thunderbolt", 2, 3),
-    ("Meteor", 3, 3);
+    ("Meteor", 3, 3),
+
+    ("Wood Shield", 1, 2),
+    ("Wind Barrier", 1, 2),
+    ("Knight's Shield", 1, 2),
+    ("Steel Prison", 2, 2),
+    ("Diamond Wall", 2, 2),
+    ("Holy Protector", 3, 2),
+    ("Demon's King Guard", 3, 2);
 
 
 insert into card_attack (ctk_attack, ctk_hp, ctk_crd_id) values
@@ -69,15 +69,6 @@ insert into card_attack (ctk_attack, ctk_hp, ctk_crd_id) values
     (7, 8, 9),
     (10, 5, 10);
 
-# insert into card_shield (csh_hp, csh_crd_id) values
-#    (1, 11),
-#    (2, 12),
-#    (3, 13),
-#    (4, 14),
-#    (5, 15),
-#    (7, 16),
-#    (7, 17);
-
 insert into card_spell (csp_attack, csp_crd_id) values
     (1, 11),
     (2, 12),
@@ -85,5 +76,14 @@ insert into card_spell (csp_attack, csp_crd_id) values
     (4, 14),
     (6, 15),
     (8, 16);
+
+insert into card_shield (csh_hp, csh_crd_id) values
+    (1, 17),
+    (2, 18),
+    (3, 19),
+    (4, 20),
+    (5, 21),
+    (7, 22),
+    (7, 23);
 
 # fake games

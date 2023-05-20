@@ -95,10 +95,10 @@ class Card {
                         where ugc_crd_id = ctk_crd_id and ugc_id = ?`,
                             [userCardData.maxID]);
 
-                        await pool.query(`
-                        Insert into user_game_card_attack
-                        (uca_ugc_id, uca_hp, uca_ap) values (?, ?, ?)`,
-                            [userCardData.maxID, cardDataDB.hp, cardDataDB.attack]);
+                        // await pool.query(`
+                        // Insert into user_game_card_attack
+                        // (uca_ugc_id, uca_hp, uca_ap) values (?, ?, ?)`,
+                        //     [userCardData.maxID, cardDataDB.hp, cardDataDB.attack]);
                     }
                 }
             return { status: 200, result: { msg: "You drew a card." } };
@@ -171,6 +171,9 @@ class Card {
                         (uca_ugc_id, uca_hp, uca_ap) 
                         values (?, ?, ?)`, 
                             [cardID, cardInfo.hp, cardInfo.ap]);
+                    }
+                    else if (cardType.typeID === 2) {
+                        await this.cardShield(cardID, boardPos, game)
                     }
                     // spell card
                     else if (cardType.typeID === 3) {
@@ -291,15 +294,11 @@ class Card {
                         where ugc_id = ?`, 
                             [ugcID.id]);
 
-                        // console.log(crdID.id)
-
                         let [[buff]] = await pool.query(`
                         Select csp_attack 
                         from card_spell 
                         where csp_crd_id =  ?`, 
                             [crdID.id]);
-
-                        // console.log(buffedCard.ugcID)
 
                         let [[buffedCardData]] = await pool.query(`
                         Select distinct uca_ap as "ap" from user_game_card_attack where uca_ugc_id = ?`,
@@ -318,7 +317,7 @@ class Card {
         }
     }
 
-    static async cardShield(card) {
+    static async cardShield(cardID, boardPos, game) {
         try {
             if (game.player.state.name == "Waiting") {
                 return {
@@ -328,8 +327,47 @@ class Card {
                     }
                 }
             } else {
-                let [[crdID]] = await pool.query(`
-                `);
+                let[[healedCard]] = await pool.query(`
+                Select ugb_ugc_id as "ugcID"
+                from user_game_board
+                where ugb_position = ? 
+                and ugb_ug_id = ?`, 
+                    [boardPos, game.player.id]);
+
+                    if (!healedCard) {
+                        return {
+                            status: 400, result: {
+                                msg:
+                                    "Please choose a valid card."
+                            }
+                        }
+                    }
+                    else {
+                        let [[ugcID]] = await pool.query(`
+                        Select ugh_ugc_id as "id" from user_game_hand
+                        where ugh_id = ?`, 
+                            [cardID]);
+
+                        let [[crdID]] = await pool.query(`
+                        Select ugc_crd_id as "id" from user_game_card
+                        where ugc_id = ?`, 
+                            [ugcID.id]);
+
+                        let [[heal]] = await pool.query(`
+                            Select csh_hp as "hp" from card_shield where csh_crd_id = ?`,
+                                [crdID.id]);
+
+                        let [[healedCardData]] = await pool.query(`
+                            Select distinct uca_hp as "hp" from user_game_card_attack where uca_ugc_id = ?`,
+                                [healedCard.ugcID]);
+
+                        healedCardData.hp += heal.hp;
+
+                        await pool.query(`
+                        Update user_game_card_attack
+                        set uca_hp = ? where uca_ugc_id = ?`,
+                            [healedCardData.hp, healedCard.ugcID]);
+                    }
             }
         } catch (err) {
             
