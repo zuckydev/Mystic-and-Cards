@@ -150,20 +150,20 @@ class Play {
             let typeDataDB = {};
             if (playerInfo.hand[i].type === 1) {
                 [[typeDataDB]] = await pool.query(
-                    `Select ctk_hp as "hp", ctk_attack as "attack" from card_attack, user_game_card where ctk_crd_id = ?`,
+                    `Select ctk_hp as "hp", ctk_attack as "attack" from card_attack where ctk_crd_id = ?`,
                         [playerInfo.hand[i].cardID]);
                 playerInfo.hand[i].attack = typeDataDB.attack;
                 playerInfo.hand[i].hp = typeDataDB.hp;
             }
             else if (playerInfo.hand[i].type === 2) {
                 [[typeDataDB]] = await pool.query(
-                    `Select csh_hp as "hp" from card_shield, user_game_card where csh_crd_id = ?`,
+                    `Select csh_hp as "hp" from card_shield where csh_crd_id = ?`,
                         [playerInfo.hand[i].cardID]);
                 playerInfo.hand[i].hp = typeDataDB.hp;
             }
             else if (playerInfo.hand[i].type === 3) {
                 [[typeDataDB]] = await pool.query(
-                    `Select csp_attack as "attack" from card_spell, user_game_card where csp_crd_id = ?`,
+                    `Select csp_attack as "attack" from card_spell where csp_crd_id = ?`,
                         [playerInfo.hand[i].cardID]);
                 playerInfo.hand[i].attack = typeDataDB.attack;
             }
