@@ -173,7 +173,7 @@ class Card {
                             [cardID, cardInfo.hp, cardInfo.ap]);
                     }
                     else if (cardType.typeID === 2) {
-                        await this.cardShield(cardID, boardPos, game)
+                        await this.cardShield(cardID, boardPos, game);
                     }
                     // spell card
                     else if (cardType.typeID === 3) {
@@ -391,28 +391,7 @@ class MatchDecks {
                 return { status: 500, result: err };
             }
     }
-    
-    // static async getMatchDeck(game) {
-    //     try {
-    //         let [dbcards] = await pool.query(`Select * from user_game_card
-    //         where `, 
-    //             [game.player.id, game.opponents[0].id]);
-    //         let playerCards = [];
-    //         let oppCards = [];
-    //         for(let dbcard of dbcards) {
-    //             let card = fromDBCardToCard(dbcard);
-    //             if (dbcard.ugc_user_game_id == game.player.id) {
-    //                 playerCards.push(card);
-    //             } else {
-    //                 oppCards.push(card);
-    //             }
-    //         }
-    //         return {status:200, result: new MatchDecks(playerCards, oppCards)};
-    //     } catch (err) {
-    //         (err);
-    //         return { status: 500, result: err };
-    //     }
-    // }
 }
 
 module.exports = Card;
+

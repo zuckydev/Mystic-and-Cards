@@ -29,7 +29,9 @@ create table user_game (
     ug_game_id int not null,
     ug_state_id int not null,
     ug_gold int not null default 15,
+    ug_energy int not null default 7,
     ug_mine_level int not null default 0,
+    ug_generator_level int not null default 0,
     ug_hp int not null default 50,
     primary key (ug_id));
 
@@ -47,6 +49,7 @@ create table card (
     crd_name varchar(60) not null,
     crd_rarity int not null,
     crd_type_id int not null,
+    crd_ecost int not null,
     primary key (crd_id));
 
 create table rarity (
