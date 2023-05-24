@@ -34,19 +34,19 @@ async function setup() {
 
     GameInfo.drawCommonCard = createButton('Draw Common Card');
     GameInfo.drawCommonCard.parent('game');
-    GameInfo.drawCommonCard.position(GameInfo.width - 250, GameInfo.height / 2 - 250);
+    GameInfo.drawCommonCard.position(GameInfo.width - 300, GameInfo.height / 2 - 300);
     GameInfo.drawCommonCard.mousePressed(drawCommonCard);
     GameInfo.drawCommonCard.addClass('game');
 
     GameInfo.drawEpicCard = createButton('Draw Epic Card');
     GameInfo.drawEpicCard.parent('game');
-    GameInfo.drawEpicCard.position(GameInfo.width - 250, (GameInfo.height / 2) - 200);
+    GameInfo.drawEpicCard.position(GameInfo.width - 300, (GameInfo.height / 2) - 250);
     GameInfo.drawEpicCard.mousePressed(drawEpicCard);
     GameInfo.drawEpicCard.addClass('game');
 
     GameInfo.drawLegendaryCard = createButton('Draw Legendary Card');
     GameInfo.drawLegendaryCard.parent('game');
-    GameInfo.drawLegendaryCard.position(GameInfo.width - 250, (GameInfo.height / 2) - 150);
+    GameInfo.drawLegendaryCard.position(GameInfo.width - 300, (GameInfo.height / 2) - 200);
     GameInfo.drawLegendaryCard.mousePressed(drawLegendaryCard);
     GameInfo.drawLegendaryCard.addClass('game');
     

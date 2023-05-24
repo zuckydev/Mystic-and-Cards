@@ -2,8 +2,8 @@
 // we only have one game info so everything is static
 class GameInfo {
     // settings variables
-    static width = 1200;
-    static height = 600;
+    static width = 1460;
+    static height = 800;
 
     static loading = true;
 
