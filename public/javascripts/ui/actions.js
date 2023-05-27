@@ -20,6 +20,7 @@ async function getGameInfo() {
 
 async function endturnAction() {
     let result = await requestEndTurn();
+    // GameInfo.sounds.Combat.play()
     if (result.successful) {
         await getGameInfo();
         GameInfo.prepareUI();
@@ -50,13 +51,13 @@ async function getBoardInfo() {
             
         } 
         else {
-            GameInfo.playerHand = new PlayerHand ("Player Cards", GameInfo.board.player.hand, 100, 450, playCardAction, 10);
+            GameInfo.playerHand = new PlayerHand ("Player Cards", GameInfo.board.player.hand, 100, 600, playCardAction, 10);
         }
         if (GameInfo.playerBoard) {
             GameInfo.playerBoard.update(GameInfo.board.player.board);
         }
         else {
-            GameInfo.playerBoard = new PlayerBoard ("Board Cards", GameInfo.board.player.board, 100, 300, null, 10);
+            GameInfo.playerBoard = new PlayerBoard ("Board Cards", GameInfo.board.player.board, 100, 400, 10, 10);
         }
 
         for (let i = 0; i < GameInfo.board.opponents.length; i++) {
@@ -70,7 +71,7 @@ async function getBoardInfo() {
             if (GameInfo.oppBoard) {
                 GameInfo.oppBoard.update(GameInfo.board.opponents[i].board);
             } else {
-                GameInfo.oppBoard = new PlayerBoard ("Opponent Board Cards", GameInfo.board.opponents[i].board, 100, 170, null, 10);
+                GameInfo.oppBoard = new PlayerBoard ("Opponent Board Cards", GameInfo.board.opponents[i].board, 100, 250, 10, 10);
             }
 
 
@@ -83,6 +84,7 @@ async function drawCardAction(deck) {
     if (result.successful) {
         await getGameInfo();
         await getBoardInfo();
+        // await GameInfo.sounds.CardPlayed.play();
         GameInfo.prepareUI();
     } else alert("Something went wrong when drawing a card.");
 }

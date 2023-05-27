@@ -18,7 +18,7 @@ class Card {
     static async drawCard(game, body) {
         try {
             let [[playernCards]] = await pool.query(`Select count(ugh_id) as "num" from user_game_hand where ugh_user_game_id = ?`, [game.player.id]);
-            console.log(playernCards.num)
+            // console.log(playernCards.num)
             let [[playerGold]] = await pool.query(`Select ug_gold as "gold" from user_game where ug_id = ?`, [game.player.id]);
             let [[cost]] = await pool.query(`Select rar_cost as "cost" from rarity where rar_id = ?`, [body.rarity]);
             

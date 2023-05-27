@@ -13,7 +13,20 @@ async function refresh() {
 }
 
 function preload() {
+    // Card Images
+    GameInfo.images.Fireball = loadImage('assets/Test.png');
 
+    // Fonts
+    GameInfo.fonts.CardFont = loadFont('assets/Minecraft.ttf');
+    GameInfo.fonts.CombatFont = loadFont('assets/OldLondon.ttf');
+
+        // GameInfo.sounds.CardPlayed = loadSound('assets/CardPlayed.mp3');
+        // GameInfo.sounds.Combat = loadSound('../public/assets/Combat.mp3');
+        // GameInfo.sounds.Button = loadSound('../public/assets/Button.mp3');
+        // GameInfo.sounds.BuyCard = loadSound('../public/assets/BuyCard.mp3');
+        // GameInfo.sounds.FrontMenu = loadSound('../public/assets/FrontMenu.mp3');
+        // GameInfo.sounds.BackGround = loadSound('../public/assets/BackGround.mp3');
+        // GameInfo.sounds.EndGame = loadSound('../public/assets/EndGame.mp3');
 }
 
 async function setup() {
