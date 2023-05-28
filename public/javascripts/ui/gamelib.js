@@ -14,11 +14,13 @@ async function refresh() {
 
 function preload() {
     // Card Images
-    GameInfo.images.Fireball = loadImage('assets/Test.png');
+    GameInfo.images.Fireball = loadImage('assets/images/FireballTest.png');
+    
+
 
     // Fonts
-    GameInfo.fonts.CardFont = loadFont('assets/Minecraft.ttf');
-    GameInfo.fonts.CombatFont = loadFont('assets/OldLondon.ttf');
+    GameInfo.fonts.CardFont = loadFont('assets/fonts/Minecraft.ttf');
+    GameInfo.fonts.CombatFont = loadFont('assets/fonts/OldLondon.ttf');
 
         // GameInfo.sounds.CardPlayed = loadSound('assets/CardPlayed.mp3');
         // GameInfo.sounds.Combat = loadSound('../public/assets/Combat.mp3');
@@ -78,23 +80,41 @@ function draw() {
     } else if (GameInfo.game.state == "Finished" && GameInfo.scoreWindow) {
         GameInfo.scoreWindow.draw();
     } else if (GameInfo.game.state == "Started") {
-        GameInfo.playerHand.draw();
         GameInfo.scoreBoard.draw();
+
+        GameInfo.playerHand.draw();
+        GameInfo.playerHand.updateDrag();
         GameInfo.oppHand.draw();
+        
         GameInfo.playerBoard.draw();
         GameInfo.oppBoard.draw();
         
     } else {
-        GameInfo.playerHand.draw();
         GameInfo.scoreBoard.draw();
+
+        GameInfo.playerHand.draw();
+        GameInfo.playerHand.updateDrag();
         GameInfo.oppHand.draw();
+
         GameInfo.playerBoard.draw();
         GameInfo.oppBoard.draw();
     }
 }
 
-async function mouseClicked() {
-    if ( GameInfo.playerHand) {
-        GameInfo.playerHand.click();
+// async function mouseClicked() {
+//     if ( GameInfo.playerHand) {
+//         GameInfo.playerHand.click();
+//     }
+// }
+
+async function mousePressed() {
+    if (GameInfo.playerHand) {
+        GameInfo.playerHand.press();
+    }
+}
+
+async function mouseReleased() {
+    if (GameInfo.playerHand) {
+        await GameInfo.playerHand.release();
     }
 }

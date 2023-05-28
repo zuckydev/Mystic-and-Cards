@@ -22,42 +22,59 @@ class Card {
         this.state = state;
         this.position = position;
         this.img = img;
+
+        // dragging
+        this.dragging = false;
+        this.offsetX = 0;
+        this.offsetY = 0;
+        this.dragX = 0;
+        this.dragY = 0;
+        this.selected = false;
     }
 
     draw(x, y) {
         this.x = x;
         this.y = y;
-        image(this.img, this.x, this.y, Card.width, Card.height);
-        // fill(
-        //     Card.bgColor[this.rarity - 1][0], // Red
-        //     Card.bgColor[this.rarity - 1][1], // Green
-        //     Card.bgColor[this.rarity - 1][2], // Blue
-        //     Card.bgColor[this.rarity - 1][3]  // Alpha
-        // );
-
-        // rect(
-        //     x,
-        //     y,
-        //     Card.width,
-        //     Card.height
-        // );
 
         fill('white');
         textFont(GameInfo.fonts.CardFont);
         textSize(Card.titleTextSize);
         textAlign(CENTER, CENTER);
         textSize(15);
-        text(this.name, x, y + 125, Card.width, Card.height * 0.25);
+        
+        if (this.dragging) {
+            image(this.img, this.dragX, this.dragY, Card.width, Card.height);
+            text(this.name, this.dragX, this.dragY + 125, Card.width, Card.height * 0.25);
+        } else {
+            image(this.img, this.x, this.y, Card.width, Card.height);
+            text(this.name, x, y + 125, Card.width, Card.height * 0.25);
+        }
+        
+        // fill(
+        //     Card.bgColor[this.rarity - 1][0], // Red
+        //     Card.bgColor[this.rarity - 1][1], // Green
+        //     Card.bgColor[this.rarity - 1][2], // Blue
+        //     Card.bgColor[this.rarity - 1][3]  // Alpha
+        // );
+        
+        // rect(
+        //     x,
+        //     y,
+        //     Card.width,
+        //     Card.height
+        // );
+        
         // rect(x + 10, y + 30, Card.width - 20, 2);
         textSize(19);
         text(Card.cardType[this.type - 1], x - 25, y + 100, Card.width, 30);
+        
 
     }
 
-    click() {
-        return mouseX > this.x && mouseX < this.x + Card.width &&
-               mouseY > this.y && mouseY < this.y + Card.height;
-    }
+    // click() {
+    //     return mouseX > this.x && mouseX < this.x + Card.width &&
+    //            mouseY > this.y && mouseY < this.y + Card.height;
+    // }
 }
 
 class MonsterCard extends Card {
@@ -72,8 +89,8 @@ class MonsterCard extends Card {
     draw(x, y) {
         super.draw(x, y);
         textSize(Card.infoTextSize);
-        text(`HP: ${this.hp}`, x, y  + (Card.height * 0.5), Card.width, Card.height * 0.5);
-        text(`Attack: ${this.attack}`, x, y  + (Card.height * 0.65), Card.width, Card.height * 0.4);
+        text(this.hp, x, y  + (Card.height * 0.5), Card.width, Card.height * 0.5);
+        text(this.attack, x, y  + (Card.height * 0.65), Card.width, Card.height * 0.4);
     }
 }
 
@@ -109,7 +126,7 @@ class PlayerHand {
     static nCards = 5;
     static titleHeight = 50;
 
-    constructor(title, cardsInfo, x, y, clickAction, cardSpacing) {
+    constructor(title, cardsInfo, x, y, clickAction, cardSpacing, dragAction) {
 
         this.title = title;
         this.x = x;
@@ -119,6 +136,11 @@ class PlayerHand {
         this.cardSpacing = cardSpacing;
         this.scale = scale;
         this.cards = this.createCards(cardsInfo);
+
+        // dragging
+        this.draggable = false;
+        this.dragAction = dragAction;
+        this.draggingCard = null;
     }
     
     createCards(cardsInfo) {
@@ -142,6 +164,14 @@ class PlayerHand {
         this.cards = this.createCards(cardsInfo);
     }
 
+    updateDrag() {
+        if (this.draggingCard) {
+            
+            this.draggingCard.dragX = mouseX + this.draggingCard.offsetX;
+            this.draggingCard.dragY = mouseY + this.draggingCard.offsetY;
+        }
+      }
+
     draw() {
         textSize(28);
         textAlign(CENTER, CENTER);
@@ -153,72 +183,102 @@ class PlayerHand {
         }
     }
 
-    click() {
-        if (this.clickAction) {
+    press() {
+        if (!this.draggable) {
+        return;
+        } 
+        else {
+
             for (let card of this.cards) {
-                if (card.click()) {
-                    this.clickAction(card);
+                if (this.draggable && mouseX > card.x && mouseX < card.x + Card.width && mouseY > card.y && mouseY < card.y + Card.height) {
+                    
+                    card.offsetX = card.x - mouseX;
+                    card.offsetY = card.y - mouseY;
+                    
+                    card.dragging = true;
+                    this.draggingCard = card;
                 }
             }
         }
     }
-}
 
+    async release() {
+        if (!this.draggable || this.draggingCard === null) {
+        return;
+        }
+        this.draggingCard.dragging = false;
+        if (this.dragAction) {
+            let cardBoardPos = GameInfo.playerBoard.getDragCardBoardPos(this.draggingCard.dragX, this.draggingCard.dragY);
+            if (cardBoardPos) {
+                await this.dragAction(this.draggingCard, cardBoardPos);
+            }
+                
+        }
+        
+        this.draggingCard = null;
+    }
+
+}
+                
 class PlayerBoard extends PlayerHand {
     constructor(title, cardsInfo, x, y, clickAction, cardSpacing) {
         super(title, cardsInfo, x, y, clickAction, cardSpacing);
     }
+
+    getDragCardBoardPos(cardX, cardY) {
+        
+        let boardPosWidth = Card.width + 10;
+        let boardPosHeight = Card.height;
+        
+        for (let i = 0; i < 3; i++) {
+            if (this.x + (boardPosWidth * i) < cardX && 
+            this.x + (boardPosWidth * (i + 1)) > cardX &&
+            this.y < cardY &&
+            (this.y + boardPosHeight) > cardY) {
+                return i + 1;
+            }
+            
+        }
+        
+        return null;
+    }
     
     draw() {
-        textSize(28);
-        textAlign(CENTER, CENTER);
-        // drawing cards
-        let x = 550;
-        for (let card of this.cards) {
-            console.log(card.position)
-            if (card.position == 1) {
-                // x = 400;
-                card.draw(x, this.y);
-            } else if (card.position == 2) {
-                x += Card.width + 10;
-                card.draw(x, this.y);
-            } else if (card.position == 3) {
-                x += (Card.width * 2) + 10;
-                card.draw(x, this.y);
-            }
-            // x += (Card.width * card.position) + this.cardSpacing;
-            
-            // card.draw(x, this.y);
-        }
-
-        // drawing the board
         const ctx = canvas.getContext("2d");
+        let boardPosWidth = Card.width + 10;
 
         ctx.fillStyle = "black";
         ctx.strokeStyle = "black";
         ctx.lineWidth = 2;
-
-        // stroke (0, 0, 0);
-        // strokeWeight (4);
+        ctx.strokeRect(this.x, this.y, Card.width, Card.height);
+        ctx.strokeRect(this.x + boardPosWidth, this.y, Card.width, Card.height);
+        ctx.strokeRect(this.x + boardPosWidth * 2, this.y, Card.width, Card.height);
         
-        ctx.strokeRect(500, 220, Card.width, Card.height);
-        // stroke();
-        // line (500, 220, 500, 560);
-        line (740, 220, 740, 560);
-        line (620, 220, 620, 560); 
-        line (500, 560, 860, 560);
-        line (860, 220, 860, 560);
-        line (500, 380, 860, 380);
-        line (500, 400, 860, 400);
-        line (500, 220, 860, 220);
+        textSize(28);
+        textAlign(CENTER, CENTER);
+
+        // drawing cards
+        for (let card of this.cards) {
+            let currentX = this.x;
+            if (card.position == 1) {
+                card.draw(currentX, this.y);
+            } else if (card.position == 2) {
+                currentX += Card.width + 10;
+                card.draw(currentX, this.y);
+            } else if (card.position == 3) {
+                currentX += (Card.width * 2) + 10;
+                card.draw(currentX, this.y);
+            }
+        }
+
         strokeWeight (1);
         stroke (0, 0, 0);
     }
 }
 
 class OppCard {
-    static width = 80;
-    static height = 130;
+    static width = 150;
+    static height = 200;
     static bgColor = [
         [91, 255, 129, 255], // Common
         [173, 91, 255, 255], // Epic
@@ -247,7 +307,6 @@ class OppCard {
             Card.width,
             Card.height
         );
-
     }
 }
 
@@ -279,10 +338,11 @@ class OppHand {
         textSize(28);
         textAlign(CENTER, CENTER);
         // text(this.title, this.x, this.y, this.width, 400);
-        let x = 400;
+        let boardPosWidth = OppCard.width + 10;
+        
         for (let card of this.cards) {
-            card.draw(x, 25);
-            x += OppCard.width;
+            card.draw(this.x + boardPosWidth * this.cards.indexOf(card), this.y);
+            // x += OppCard.width;
         }
     }
 }

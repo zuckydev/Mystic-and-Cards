@@ -40,19 +40,22 @@ class GameInfo {
             GameInfo.drawCommonCard.show();
             GameInfo.drawEpicCard.show();
             GameInfo.drawLegendaryCard.show();
+            GameInfo.playerHand.draggable = true;
 
         } else if (GameInfo.game.player.state == "Waiting") {
             GameInfo.endturnButton.hide();
             GameInfo.drawCommonCard.hide();
             GameInfo.drawEpicCard.hide();
             GameInfo.drawLegendaryCard.hide();
-
+            GameInfo.playerHand.draggable = false;
+            
         } else if (GameInfo.game.player.state == "Score") {
             GameInfo.endturnButton.hide();
             GameInfo.scoreWindow.open();
             GameInfo.drawCommonCard.hide();
             GameInfo.drawEpicCard.hide();
             GameInfo.drawLegendaryCard.hide();
+            GameInfo.playerHand.draggable = false;
         }
     }
 }

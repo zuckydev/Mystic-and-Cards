@@ -51,13 +51,13 @@ async function getBoardInfo() {
             
         } 
         else {
-            GameInfo.playerHand = new PlayerHand ("Player Cards", GameInfo.board.player.hand, 100, 600, playCardAction, 10);
+            GameInfo.playerHand = new PlayerHand ("Player Cards", GameInfo.board.player.hand, 100, 630, null, 10, dragToBoard);
         }
         if (GameInfo.playerBoard) {
             GameInfo.playerBoard.update(GameInfo.board.player.board);
         }
         else {
-            GameInfo.playerBoard = new PlayerBoard ("Board Cards", GameInfo.board.player.board, 100, 400, 10, 10);
+            GameInfo.playerBoard = new PlayerBoard ("Board Cards", GameInfo.board.player.board, 450, 390, 10, 10);
         }
 
         for (let i = 0; i < GameInfo.board.opponents.length; i++) {
@@ -65,13 +65,13 @@ async function getBoardInfo() {
             if (GameInfo.oppHand) {
                 GameInfo.oppHand.update(GameInfo.board.opponents[i].hand);
             } else {
-                GameInfo.oppHand = new OppHand ("Opponent Cards", GameInfo.board.opponents[i].hand, 100, 400, playCardAction, 10);
+                GameInfo.oppHand = new OppHand ("Opponent Cards", GameInfo.board.opponents[i].hand, 500, -60, null, 10, null);
             }
 
             if (GameInfo.oppBoard) {
                 GameInfo.oppBoard.update(GameInfo.board.opponents[i].board);
             } else {
-                GameInfo.oppBoard = new PlayerBoard ("Opponent Board Cards", GameInfo.board.opponents[i].board, 100, 250, 10, 10);
+                GameInfo.oppBoard = new PlayerBoard ("Opponent Board Cards", GameInfo.board.opponents[i].board, 450, 170, 10, 10);
             }
 
 
@@ -101,8 +101,9 @@ async function drawLegendaryCard() {
     drawCardAction(3);
 }
 
-async function playCardAction(card) {
-    let boardPos = parseInt(prompt("What position (1, 2, 3)?"));
+async function playCardAction(card, boardPos) {
+    // let boardPos = parseInt(prompt("What position (1, 2, 3)?"));
+    console.log(card);
     
     if (boardPos > 4 || boardPos < 1) {
         alert("Please select a valid position.");
@@ -114,4 +115,10 @@ async function playCardAction(card) {
     }
     
     await getBoardInfo();
+}
+
+async function dragToBoard(card, boardPosition) {
+    
+    await playCardAction(card.id, boardPosition);
+    
 }
