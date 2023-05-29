@@ -229,7 +229,7 @@ class PlayerBoard extends PlayerHand {
         let boardPosHeight = Card.height;
         
         for (let i = 0; i < 3; i++) {
-            if (this.x + (boardPosWidth * i) < (cardX + Card.width) && 
+            if (this.x + (boardPosWidth * i) < cardX && 
             this.x + (boardPosWidth * (i + 1)) > cardX &&
             this.y < cardY &&
             (this.y + boardPosHeight) > cardY) {
