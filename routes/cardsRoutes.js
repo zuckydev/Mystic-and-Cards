@@ -38,15 +38,15 @@ router.post("/draw", auth.verifyAuth, async function (req, res, next) {
     }
 });
 
-router.patch("/playCard", auth.verifyAuth, async function (req, res, next) {
+router.patch("/play", auth.verifyAuth, async function (req, res, next) {
     try {
-        console.log("Playing card");
-        // console.log(req.body);
         if (!req.game) {
             res.status(400).send({ msg: "You are not in a game, please create or join a game" });
         }
         else {
+            
             let result = await Card.playCard(req.game, req.body.selectedCard, req.body.boardPosition);
+            console.log(result)
             res.status(result.status).send(result.result);
         }
     } catch (err) {

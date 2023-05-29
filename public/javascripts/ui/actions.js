@@ -102,12 +102,11 @@ async function drawLegendaryCard() {
 }
 
 async function playCardAction(card, boardPos) {
-    // let boardPos = parseInt(prompt("What position (1, 2, 3)?"));
-    console.log(card);
     
     if (boardPos > 4 || boardPos < 1) {
         alert("Please select a valid position.");
     } else {
+        
         let result = await requestPlayCard(card, boardPos);
         if (!result.successful) {
             alert("Something went wrong when playing a card");
@@ -120,5 +119,4 @@ async function playCardAction(card, boardPos) {
 async function dragToBoard(card, boardPosition) {
     
     await playCardAction(card.id, boardPosition);
-    
 }

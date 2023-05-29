@@ -15,6 +15,13 @@ async function refresh() {
 function preload() {
     // Card Images
     GameInfo.images.Fireball = loadImage('assets/images/FireballTest.png');
+    GameInfo.images.cards = [
+        loadImage('assets/images/1.png'),
+        loadImage('assets/images/2.png'),
+        loadImage('assets/images/3.png'),
+        loadImage('assets/images/4.png'),
+        loadImage('assets/images/4.png')
+    ]
     
 
 
@@ -71,7 +78,7 @@ async function setup() {
 }
 
 function draw() {
-    background(210, 210, 210);
+    background("#996633");
     if (GameInfo.loading) {
         textAlign(CENTER, CENTER);
         textSize(40);

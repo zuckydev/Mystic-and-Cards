@@ -56,7 +56,7 @@ async function requestDrawCard(deck) {
 async function requestPlayCard(card, boardPos) {
     try {
         
-        const response = await fetch(`/api/cards/playCard`,
+        const response = await fetch(`/api/cards/play`,
             {
                 headers: {
                     'Accept': 'application/json',

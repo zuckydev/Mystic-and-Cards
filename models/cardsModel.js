@@ -112,7 +112,7 @@ class Card {
         }
     }
     
-    static async playCard(game, cardID, boardPos) {
+    static async playCard(game, ugcID, boardPos) {
         try {
             if (game.player.state.name == "Waiting") {
                 return {
@@ -122,14 +122,14 @@ class Card {
                     }
                 }
             }
-            console.log(cardID);
+            console.log(ugcID)
             let [[cardData]] = await pool.query(
-                `Select ugc_crd_id as "id", crd_type_id as "typeID"
-                from user_game_card, card where ugc_crd_id = crd_id and ugc_id = ?`,
-                    [cardID]);
-            
+                `Select ugc_crd_id as "cardID", crd_type_id as "typeID", ugh_id as "ughID"
+                from user_game_card, user_game_hand, card where ugc_crd_id = crd_id and ugh_ugc_id = ugc_id and ugc_id = ?`,
+                [ugcID]);
+                
             if (!cardData) {
-                return {status:404, result:{msg:"Please select a valid card."}};
+                return {status:400, result:{msg:"Please select a valid card."}};
             }
             
             let [[cardInPlace]] = await pool.query(
@@ -146,35 +146,35 @@ class Card {
             }
 
             // changes state of the card to board
-            await pool.query(`Update user_game_card set ugc_state_id = 2 where ugc_id = ?`, [cardID]);
+            await pool.query(`Update user_game_card set ugc_state_id = 2 where ugc_id = ?`, [ugcID]);
 
             let result;
             // monster card
             if (cardData.typeID === 1) {
-                await Card.cardToBoard(cardID, boardPos, game);
+                await Card.cardToBoard(ugcID, boardPos, game);
 
                 let [[cardInfo]] = await pool.query(
                     `Select distinct(ctk_attack) as "ap", ctk_hp as "hp" 
                     from card_attack
                     where ctk_crd_id = ?`, 
-                        [cardData.id]);
+                        [cardData.cardID]);
             
                 await pool.query(
                     `Insert into user_game_card_attack
                     (uca_ugc_id, uca_hp, uca_ap) 
                     values (?, ?, ?)`, 
-                        [cardID, cardInfo.hp, cardInfo.ap]);
+                        [ugcID, cardInfo.hp, cardInfo.ap]);
                 result = {status:200, msg:"Card Played."}
             }
             else if (cardData.typeID === 2) {
-                result = await Card.cardShield(cardData.id, boardPos, game);
+                result = await Card.cardShield(ugcID, boardPos, game);
             }
             // spell card
             else if (cardData.typeID === 3) {
-                result = await Card.cardSpell(cardData.id, boardPos, game);
+                result = await Card.cardSpell(ugcID, boardPos, game);
             }
             
-            await pool.query(`Delete from user_game_hand where ugh_id = ?`, [cardID]);
+            await pool.query(`Delete from user_game_hand where ugh_id = ?`, [cardData.ughID]);
 
             return result;
 
@@ -191,7 +191,7 @@ class Card {
                 [cardID, boardPos, game.player.id]);
     }
 
-    static async cardAttack(cardID, boardPos, opponents) {
+    static async cardAttack(ugcID, boardPos, opponents) {
         
         for (let i = 0; i < opponents.length; i++) {
 
@@ -199,7 +199,7 @@ class Card {
             Select uca_ap as "ap" 
             from user_game_card_attack 
             where uca_ugc_id = ?`, 
-                [cardID]);
+                [ugcID]);
 
             let [[cardInFront]] = await pool.query(`
             Select ugb_ugc_id as "ugcID" 
@@ -247,7 +247,7 @@ class Card {
         }
     }
 
-    static async cardSpell(cardID, boardPos, game) {
+    static async cardSpell(ugcID, boardPos, game) {
         try {
             
             let[[buffedCard]] = await pool.query(
@@ -260,11 +260,13 @@ class Card {
                 return { status: 400, msg: "Please choose a valid card." }
             }
 
+            let [[cardData]] = await pool.query(`select ugc_crd_id as "cardID" from user_game_card where ugc_id = ?`, [ugcID]);
+
             let [[buff]] = await pool.query(
                 `Select csp_attack 
                 from card_spell 
                 where csp_crd_id =  ?`, 
-                    [cardID]);
+                    [cardData.cardID]);
 
             let [[buffedCardData]] = await pool.query(
                 `Select uca_ap as "ap" from user_game_card_attack where uca_ugc_id = ?`,
@@ -283,7 +285,7 @@ class Card {
         }
     }
 
-    static async cardShield(cardID, boardPos, game) {
+    static async cardShield(ugcID, boardPos, game) {
         try {
             // Get the card that is going to be healed
             let[[healedCard]] = await pool.query(
@@ -297,10 +299,12 @@ class Card {
                 return { status: 400, msg:"Please choose a valid card." }
             }
 
+            let [[cardData]] = await pool.query(`select ugc_crd_id as "cardID" from user_game_card where ugc_id = ?`, [ugcID]);
+
             // Get the heal amount
             let [[healingData]] = await pool.query(`
                 Select csh_hp as "hp" from card_shield where csh_crd_id = ?`,
-                    [cardID]);
+                    [cardData.cardID]);
 
             // Get the data of the monster
             let [[healedCardData]] = await pool.query(`
