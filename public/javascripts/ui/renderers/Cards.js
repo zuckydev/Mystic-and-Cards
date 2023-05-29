@@ -2,7 +2,7 @@ class Card {
     static width = 150;
     static height = 200;
     static titleTextSize = 12;
-    static infoTextSize = 23;
+    static infoTextSize = 25;
     static bgColor = [
         [91, 255, 129, 255], // Common
         [173, 91, 255, 255], // Epic
@@ -40,41 +40,20 @@ class Card {
         textFont(GameInfo.fonts.CardFont);
         textSize(Card.titleTextSize);
         textAlign(CENTER, CENTER);
-        textSize(15);
+        textSize(18);
         
         if (this.dragging) {
             image(this.img, this.dragX, this.dragY, Card.width, Card.height);
             text(this.name, this.dragX, this.dragY + 125, Card.width, Card.height * 0.25);
+            textSize(19);
+            text(Card.cardType[this.type - 1], this.dragX - 25, this.dragY + 100, Card.width, 30);
         } else {
             image(this.img, this.x, this.y, Card.width, Card.height);
-            text(this.name, x, y + 125, Card.width, Card.height * 0.25);
+            text(this.name, this.x, this.y + 130, Card.width, Card.height * 0.25);
+            textSize(19);
+            text(Card.cardType[this.type - 1], x - 25, y + 103, Card.width, 30);
         }
-        
-        // fill(
-        //     Card.bgColor[this.rarity - 1][0], // Red
-        //     Card.bgColor[this.rarity - 1][1], // Green
-        //     Card.bgColor[this.rarity - 1][2], // Blue
-        //     Card.bgColor[this.rarity - 1][3]  // Alpha
-        // );
-        
-        // rect(
-        //     x,
-        //     y,
-        //     Card.width,
-        //     Card.height
-        // );
-        
-        // rect(x + 10, y + 30, Card.width - 20, 2);
-        textSize(19);
-        text(Card.cardType[this.type - 1], x - 25, y + 100, Card.width, 30);
-        
-
     }
-
-    // click() {
-    //     return mouseX > this.x && mouseX < this.x + Card.width &&
-    //            mouseY > this.y && mouseY < this.y + Card.height;
-    // }
 }
 
 class MonsterCard extends Card {
@@ -89,8 +68,15 @@ class MonsterCard extends Card {
     draw(x, y) {
         super.draw(x, y);
         textSize(Card.infoTextSize);
-        text(this.hp, x, y  + (Card.height * 0.5), Card.width, Card.height * 0.5);
-        text(this.attack, x, y  + (Card.height * 0.65), Card.width, Card.height * 0.4);
+        textFont(GameInfo.fonts.CombatFont);
+        if (this.dragging) {
+            text(this.hp, this.dragX + 57, this.dragY + 68, Card.width, Card.height * 0.5);
+            text(this.attack, this.dragX + 32, this.dragY + 68, Card.width, Card.height * 0.5);
+
+        } else {
+            text(this.hp, x + 57, y + 68, Card.width, Card.height * 0.5);
+            text(this.attack, x + 32, y  + 68, Card.width, Card.height * 0.5);
+        }
     }
 }
 
@@ -104,7 +90,12 @@ class ShieldCard extends Card {
         super.draw(x, y);
         textFont(GameInfo.fonts.CombatFont);
         textSize(Card.infoTextSize);
-        text(this.hp, x + 42, y  + 65, Card.width, Card.height * 0.5);
+
+        if (this.dragging) {
+            text(this.hp, this.dragX + 42, this.dragY  + 65, Card.width, Card.height * 0.5);
+        } else {
+            text(this.hp, x + 42, y  + 65, Card.width, Card.height * 0.5);
+        }
     } 
     
 }
@@ -118,7 +109,12 @@ class SpellCard extends Card {
     draw(x, y) {
         super.draw(x, y);
         textSize(Card.infoTextSize);
-        text(`Attack: ${this.attack}`, x, y  + (Card.height * 0.6), Card.width, Card.height * 0.4);
+
+        if (this.dragging) {
+            text(this.attack, this.dragX, this.dragY  + (Card.height * 0.6), Card.width, Card.height * 0.4);
+        } else {
+            text(this.attack, x, y  + (Card.height * 0.6), Card.width, Card.height * 0.4);
+        }
     }
 }
 
@@ -148,7 +144,7 @@ class PlayerHand {
         for (let cardInfo of cardsInfo) {
             
             if (cardInfo.type == 1) {
-                cards.push(new MonsterCard(cardInfo.id, cardInfo.name, cardInfo.rarity, cardInfo.type, cardInfo.state, cardInfo.position, GameInfo.images.Fireball, cardInfo.hp, cardInfo.attack));
+                cards.push(new MonsterCard(cardInfo.id, cardInfo.name, cardInfo.rarity, cardInfo.type, cardInfo.state, cardInfo.position, GameInfo.images.cards[cardInfo.cardID - 1], cardInfo.hp, cardInfo.attack));
             }
             else if (cardInfo.type == 2) {
                 cards.push(new ShieldCard(cardInfo.id, cardInfo.name, cardInfo.rarity, cardInfo.type, cardInfo.state, cardInfo.position, GameInfo.images.Fireball, cardInfo.hp));
@@ -209,29 +205,31 @@ class PlayerHand {
         this.draggingCard.dragging = false;
         if (this.dragAction) {
             let cardBoardPos = GameInfo.playerBoard.getDragCardBoardPos(this.draggingCard.dragX, this.draggingCard.dragY);
+            
+            // console.log(cardBoardPos)
             if (cardBoardPos) {
                 await this.dragAction(this.draggingCard, cardBoardPos);
             }
                 
         }
-        
         this.draggingCard = null;
     }
 
 }
                 
 class PlayerBoard extends PlayerHand {
-    constructor(title, cardsInfo, x, y, clickAction, cardSpacing) {
-        super(title, cardsInfo, x, y, clickAction, cardSpacing);
+    constructor(title, cardsInfo, x, y, clickAction, cardSpacing, dragAction) {
+        super(title, cardsInfo, x, y, clickAction, cardSpacing, dragAction);
     }
 
     getDragCardBoardPos(cardX, cardY) {
+        // console.log(cardX)
         
         let boardPosWidth = Card.width + 10;
         let boardPosHeight = Card.height;
         
         for (let i = 0; i < 3; i++) {
-            if (this.x + (boardPosWidth * i) < cardX && 
+            if (this.x + (boardPosWidth * i) < (cardX + Card.width) && 
             this.x + (boardPosWidth * (i + 1)) > cardX &&
             this.y < cardY &&
             (this.y + boardPosHeight) > cardY) {
