@@ -53,6 +53,28 @@ async function requestDrawCard(deck) {
     }
 }
 
+async function requestUpgradeMine() {
+    try {
+        const response = await fetch(`/api/mine/upgrade`,
+            {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                method: "POST",
+                body: JSON.stringify({
+                })
+
+            });
+        return { successful: response.status == 200 };
+    } catch (err) {
+        // Treat 500 errors here
+        console.log(err);
+        return { err: err };
+    }
+}
+
+
 async function requestPlayCard(card, boardPos) {
     try {
         

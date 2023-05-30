@@ -264,7 +264,7 @@ class PlayerBoard extends PlayerHand {
                 currentX += Card.width + 10;
                 card.draw(currentX, this.y);
             } else if (card.position == 3) {
-                currentX += (Card.width * 2) + 10;
+                currentX += ((Card.width + 10) * 2);
                 card.draw(currentX, this.y);
             }
         }

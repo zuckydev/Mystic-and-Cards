@@ -15,6 +15,7 @@ class ScoreBoard {
         fill(0, 0, 0);
         textAlign(LEFT, CENTER);
         textSize(20);
+        textFont(GameInfo.fonts.CombatFont);
         textStyle(BOLD);
         text("Turn: " + this.game.turn, 20, 370);
         text(this.game.player.name, ScoreBoard.x + 10, 750);

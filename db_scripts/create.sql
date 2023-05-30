@@ -1,4 +1,4 @@
-drop database macdb;
+drop database if exists macdb;
 
 create database macdb;
 
@@ -29,9 +29,8 @@ create table user_game (
     ug_game_id int not null,
     ug_state_id int not null,
     ug_gold int not null default 15,
-    ug_energy int not null default 7,
-    ug_mine_level int not null default 0,
-    ug_generator_level int not null default 0,
+    ug_mine_level int not null default 1,
+	ug_mine_level_cost int not null default 5,
     ug_hp int not null default 50,
     primary key (ug_id));
 
@@ -49,7 +48,6 @@ create table card (
     crd_name varchar(60) not null,
     crd_rarity int not null,
     crd_type_id int not null,
-    crd_ecost int not null,
     primary key (crd_id));
 
 create table rarity (
@@ -115,6 +113,18 @@ create table user_game_discard (
     ugd_id int not null auto_increment,
     ugd_ugc_id int not null,
     primary key(ugd_id));
+
+create table scoreboard (
+    sb_id int not null auto_increment,
+    sb_user_game_id int not null,
+    sb_state_id int not null,
+    sb_points int not null,
+    primary key (sb_id));
+
+create table scoreboard_state (
+    sbs_id int not null auto_increment,
+    sbs_state varchar(60) not null,
+    primary key (sbs_id));
 
 # Foreign Keys
 

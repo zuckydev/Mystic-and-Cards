@@ -1,16 +1,18 @@
 const pool = require("../config/database");
 const Card = require("./cardsModel");
+const { upgradeMine } = require("./mineModel");
 
 // auxiliary function to check if the game ended 
 async function checkEndGame(game) {
-    return game.turn >= Play.maxNumberTurns;
+    let ug = await pool.query(`select * from user_game where ug_game_id = ? and ug_user_id = ?`, [game.id, game.player.id]);
+    return ug[0][0].ug_hp <= Play.minHp;
 }
 
 class Play {
     // At this moment I do not need to store information so we have no constructor
 
     // Just a to have a way to determine end of game
-    static maxNumberTurns = 10;
+    static minHp = 0;
 
     // we consider all verifications were made
     static async startGame(game) {
@@ -52,7 +54,7 @@ class Play {
                 [2, game.opponents[0].id]);
 
             // Both players played
-            if (game.player.order == 2) {
+            if (true || game.player.order === 2) {
                 // Criteria to check if game ended
                 if (await checkEndGame(game)) {
                     return await Play.endGame(game);
@@ -79,12 +81,14 @@ class Play {
                 }
             }
 
-            [[game.player.gold]] = await pool.query(`Select ug_gold as "gold" from user_game where ug_id = ?`, [game.player.id]);
+            [[game.player.gold]] = await pool.query(`SELECT ug_gold AS "gold" FROM user_game WHERE ug_id = ?`, [game.player.id]);
+            const [[{ ug_mine_level: minelevel }]] = await pool.query(`SELECT ug_mine_level FROM user_game WHERE ug_id = ?`, [game.player.id]);
             
-            game.player.gold.gold += 4;
-            await pool.query(`Update user_game set ug_gold = ? where ug_id = ?`, [game.player.gold.gold, game.player.id]);
-
+            game.player.gold.gold += 2 + minelevel * 2;
+            await pool.query(`UPDATE user_game SET ug_gold = ? WHERE ug_id = ?`, [game.player.gold.gold, game.player.id]);
+            
             return { status: 200, result: { msg: "Your turn ended." } };
+            
         } catch (err) {
             console.log(err);
             return { status: 500, result: err };

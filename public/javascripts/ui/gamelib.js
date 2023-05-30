@@ -20,28 +20,47 @@ function preload() {
         loadImage('assets/images/2.png'),
         loadImage('assets/images/3.png'),
         loadImage('assets/images/4.png'),
-        loadImage('assets/images/4.png')
+        loadImage('assets/images/5.png'),
+        loadImage('assets/images/6.png'),
+        loadImage('assets/images/7.png'),
+        loadImage('assets/images/8.png'),
+        loadImage('assets/images/9.png'),
+        loadImage('assets/images/10.png'),
+        loadImage('assets/images/11.png'),
+        loadImage('assets/images/12.png'),
+        loadImage('assets/images/13.png')
     ]
     
-
-
     // Fonts
     GameInfo.fonts.CardFont = loadFont('assets/fonts/Minecraft.ttf');
     GameInfo.fonts.CombatFont = loadFont('assets/fonts/OldLondon.ttf');
 
-        // GameInfo.sounds.CardPlayed = loadSound('assets/CardPlayed.mp3');
-        // GameInfo.sounds.Combat = loadSound('../public/assets/Combat.mp3');
-        // GameInfo.sounds.Button = loadSound('../public/assets/Button.mp3');
-        // GameInfo.sounds.BuyCard = loadSound('../public/assets/BuyCard.mp3');
-        // GameInfo.sounds.FrontMenu = loadSound('../public/assets/FrontMenu.mp3');
-        // GameInfo.sounds.BackGround = loadSound('../public/assets/BackGround.mp3');
-        // GameInfo.sounds.EndGame = loadSound('../public/assets/EndGame.mp3');
+    // Sounds
+    GameInfo.sounds.CardPlayed = loadSound('assets/sounds/CardPlayed.mp3');
+    GameInfo.sounds.Combat = loadSound('assets/sounds/Combat.mp3');
+    GameInfo.sounds.Button = loadSound('assets/sounds/Button.mp3');
+    GameInfo.sounds.BuyCard = loadSound('assets/sounds/BuyCard.mp3');
+    GameInfo.sounds.FrontMenu = loadSound('assets/sounds/FrontMenu.mp3');
+    GameInfo.sounds.BackGround = loadSound('assets/sounds/BackGround.mp3');
+    GameInfo.sounds.EndGame = loadSound('assets/sounds/EndGame.mp3');
 }
+
+async function cancel() {
+    try {
+        let result = await requestCancelMatch();
+        if (result.successful)
+            window.location.pathname = "matches.html"
+        else
+            window.location.pathname = "matches.html"
+    } catch (err) {
+        console.log(err);
+    }
+}
+
 
 async function setup() {
     let canvas = createCanvas(GameInfo.width, GameInfo.height);
     canvas.parent('game');
-    // preload  images
 
     await getGameInfo();
     await getBoardInfo();
@@ -50,9 +69,15 @@ async function setup() {
     //buttons (create a separated function if they are many)
     GameInfo.endturnButton = createButton('End Turn');
     GameInfo.endturnButton.parent('game');
-    GameInfo.endturnButton.position(GameInfo.width - 150, GameInfo.height - 50);
+    GameInfo.endturnButton.position(GameInfo.width - 150, GameInfo.height - 70);
     GameInfo.endturnButton.mousePressed(endturnAction);
     GameInfo.endturnButton.addClass('game');
+
+    GameInfo.endButton = createButton('Return to Menu');
+    GameInfo.endButton.parent('game');
+    GameInfo.endButton.position(950, GameInfo.height - 50);
+    GameInfo.endButton.mousePressed(cancel);
+    GameInfo.endButton.addClass('game');
 
     GameInfo.drawCommonCard = createButton('Draw Common Card');
     GameInfo.drawCommonCard.parent('game');
@@ -71,6 +96,12 @@ async function setup() {
     GameInfo.drawLegendaryCard.position(GameInfo.width - 300, (GameInfo.height / 2) - 200);
     GameInfo.drawLegendaryCard.mousePressed(drawLegendaryCard);
     GameInfo.drawLegendaryCard.addClass('game');
+
+    GameInfo.upgradeMine = createButton('Upgrade Mine');
+    GameInfo.upgradeMine.parent('game');
+    GameInfo.upgradeMine.position(GameInfo.width - 300, GameInfo.height / 2 - 100);
+    GameInfo.upgradeMine.mousePressed(upgradeMine);
+    GameInfo.upgradeMine.addClass('game');
     
     GameInfo.prepareUI();
 
@@ -79,6 +110,9 @@ async function setup() {
 
 function draw() {
     background("#996633");
+    if (!GameInfo.sounds.BackGround.isPlaying()) {
+        GameInfo.sounds.BackGround.play();
+    }
     if (GameInfo.loading) {
         textAlign(CENTER, CENTER);
         textSize(40);
@@ -107,12 +141,6 @@ function draw() {
         GameInfo.oppBoard.draw();
     }
 }
-
-// async function mouseClicked() {
-//     if ( GameInfo.playerHand) {
-//         GameInfo.playerHand.click();
-//     }
-// }
 
 async function mousePressed() {
     if (GameInfo.playerHand) {

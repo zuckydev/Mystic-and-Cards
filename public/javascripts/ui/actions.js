@@ -20,7 +20,7 @@ async function getGameInfo() {
 
 async function endturnAction() {
     let result = await requestEndTurn();
-    // GameInfo.sounds.Combat.play()
+    GameInfo.sounds.Combat.play();
     if (result.successful) {
         await getGameInfo();
         GameInfo.prepareUI();
@@ -84,7 +84,7 @@ async function drawCardAction(deck) {
     if (result.successful) {
         await getGameInfo();
         await getBoardInfo();
-        // await GameInfo.sounds.CardPlayed.play();
+        GameInfo.sounds.CardPlayed.play();
         GameInfo.prepareUI();
     } else alert("Something went wrong when drawing a card.");
 }
@@ -101,6 +101,20 @@ async function drawLegendaryCard() {
     drawCardAction(3);
 }
 
+async function upgradeMine() {
+    upgradeMineAction(3);
+}
+
+async function upgradeMineAction() {
+    let result = await requestUpgradeMine();
+    if (result.successful) {
+        await getGameInfo();
+        await getBoardInfo();
+        GameInfo.prepareUI();
+    } else alert("Something went wrong when upgrading the mine.");
+}
+
+
 async function playCardAction(card, boardPos) {
     
     if (boardPos > 4 || boardPos < 1) {
@@ -112,11 +126,10 @@ async function playCardAction(card, boardPos) {
             alert("Something went wrong when playing a card");
         }
     }
-    
+    GameInfo.sounds.BuyCard.play();
     await getBoardInfo();
 }
 
 async function dragToBoard(card, boardPosition) {
-    
     await playCardAction(card.id, boardPosition);
 }

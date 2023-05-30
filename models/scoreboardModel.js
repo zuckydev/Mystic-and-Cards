@@ -22,17 +22,17 @@ class PlayerScore {
     // Since this an auxiliary class we consider all verifications are done
     static async getPlayerScore(playerId) {
         try {
-            let [dbPlayerScores] = await pool.query(`Select * from user 
-            inner join user_game on ug_user_id = usr_id
-            inner join scoreboard on sb_user_game_id = ug_id
-            inner join scoreboard_state on sb_state_id = sbs_id
-            where ug_id=?`, [playerId]);
+            let dbPlayerScores = await pool.query(`Select * from user 
+                inner join user_game on ug_user_id = usr_id
+                inner join scoreboard on sb_user_game_id = ug_id
+                inner join scoreboard_state on sb_state_id = sbs_id
+                where ug_id=?`, [playerId]);
             let dbPS = dbPlayerScores[0];
             let pScore = new PlayerScore(dbPS.usr_id, dbPS.ug_id, dbPS.usr_name,
                 new State(dbPS.sbs_id, dbPS.sbs_state), dbPS.sb_points);
             return { status: 200, result: pScore };
         } catch (err) {
-            console.log(err);
+            console.error(err);
             return { status: 500, result: err };
         }
     }
@@ -53,7 +53,7 @@ class ScoreBoardLine {
             let pScores = [];
             for (let pId of playerIds) {
                 let result = await PlayerScore.getPlayerScore(pId);
-                if (result.status != 200) return result;
+                if (result.status !== 200) return result;
                 pScores.push(result.result);
             }
             let sbLine = new ScoreBoardLine(gameId, pScores);
@@ -73,8 +73,7 @@ class ScoreBoardLine {
             for (let opp of game.opponents) {
                 playerIds.push(opp.id);
             }
-            let result = await ScoreBoardLine.getScoreBoardLine(game.id, playerIds);
-            return result;
+            return await ScoreBoardLine.getScoreBoardLine(game.id, playerIds);
         } catch (err) {
             console.log(err);
             return { status: 500, result: err };
@@ -93,7 +92,7 @@ class ScoreBoardLine {
             let currGameId = -1;
             let currSB;
             for (let line of dbSBLines) {
-                if (line.gm_id != currGameId) {
+                if (line.gm_id !== currGameId) {
                     if (currSB) sbLines.push(currSB);
                     currSB = new ScoreBoardLine(line.gm_id, []);
                     currGameId = line.gm_id;

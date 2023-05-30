@@ -31,6 +31,8 @@ class GameInfo {
     static drawCommonCard;
     static drawEpicCard;
     static drawLegendaryCard;
+    static upgradeMine;
+    static endButton;
 
     // Write your UI settings for each game state here
     // Call the method every time there is a game state change
@@ -40,13 +42,17 @@ class GameInfo {
             GameInfo.drawCommonCard.show();
             GameInfo.drawEpicCard.show();
             GameInfo.drawLegendaryCard.show();
+            GameInfo.upgradeMine.show();
+            GameInfo.endButton.hide();
             GameInfo.playerHand.draggable = true;
-
+            
         } else if (GameInfo.game.player.state == "Waiting") {
             GameInfo.endturnButton.hide();
             GameInfo.drawCommonCard.hide();
             GameInfo.drawEpicCard.hide();
             GameInfo.drawLegendaryCard.hide();
+            GameInfo.upgradeMine.hide();
+            GameInfo.endButton.hide();
             GameInfo.playerHand.draggable = false;
             
         } else if (GameInfo.game.player.state == "Score") {
@@ -55,7 +61,19 @@ class GameInfo {
             GameInfo.drawCommonCard.hide();
             GameInfo.drawEpicCard.hide();
             GameInfo.drawLegendaryCard.hide();
+            GameInfo.upgradeMine.hide();
+            GameInfo.endButton.hide();
             GameInfo.playerHand.draggable = false;
+
+        }else if (GameInfo.game.player.state == "End") {
+            GameInfo.endturnButton.hide();
+            GameInfo.scoreWindow.open();
+            GameInfo.drawCommonCard.hide();
+            GameInfo.drawEpicCard.hide();
+            GameInfo.drawLegendaryCard.hide();
+            GameInfo.upgradeMine.hide();
+            GameInfo.endButton.show();
+            GameInfo.sounds.Button.play()
         }
     }
 }

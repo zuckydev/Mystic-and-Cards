@@ -1,10 +1,6 @@
 const pool = require("../config/database");
 const utils = require("../config/utils");
 
-// function fromDBCardToCard(dbCard) {
-//     return new Card(dbCard.crd_id)
-// }
-
 class Card {
     constructor(cardId, deckId, name, type, state, userCardHandData) {
         this.cardId = cardId;
@@ -124,8 +120,11 @@ class Card {
             }
             console.log(ugcID)
             let [[cardData]] = await pool.query(
-                `Select ugc_crd_id as "cardID", crd_type_id as "typeID", ugh_id as "ughID"
-                from user_game_card, user_game_hand, card where ugc_crd_id = crd_id and ugh_ugc_id = ugc_id and ugc_id = ?`,
+                `Select ugc_crd_id as "cardID", 
+                crd_type_id as "typeID", 
+                ugh_id as "ughID"
+                from user_game_card, user_game_hand, card 
+                where ugc_crd_id = crd_id and ugh_ugc_id = ugc_id and ugc_id = ?`,
                 [ugcID]);
                 
             if (!cardData) {
@@ -327,22 +326,22 @@ class Card {
     }
 }
 
-// class MatchDecks {
-//     constructor(myCards, oppCards) {
-//         this.myCards = myCards;
-//         this.oppCards = oppCards;
-//     }
+class MatchDecks {
+    constructor(myCards, oppCards) {
+        this.myCards = myCards;
+        this.oppCards = oppCards;
+    }
     
-//     static async resetPlayerDeck(playerId) {
-//             try {
-//                 let [result] = await pool.query(`delete from user_game_card where ugc_user_game_id = ?`, [playerId]);
-//                 return {status:200, result: {msg:"All cards removed"}};
-//             } catch (err) {
-//                 console.log(err);
-//                 return { status: 500, result: err };
-//             }
-//     }
-// }
+    static async resetPlayerDeck(playerId) {
+            try {
+                let [result] = await pool.query(`delete from user_game_card where ugc_user_game_id = ?`, [playerId]);
+                return {status:200, result: {msg:"All cards removed"}};
+            } catch (err) {
+                console.log(err);
+                return { status: 500, result: err };
+            }
+    }
+}
 
 module.exports = Card;
 
