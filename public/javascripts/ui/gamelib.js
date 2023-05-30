@@ -14,7 +14,7 @@ async function refresh() {
 
 function preload() {
     // Card Images
-    GameInfo.images.Fireball = loadImage('assets/images/FireballTest.png');
+    
     GameInfo.images.cards = [
         loadImage('assets/images/1.png'),
         loadImage('assets/images/2.png'),
@@ -28,7 +28,24 @@ function preload() {
         loadImage('assets/images/10.png'),
         loadImage('assets/images/11.png'),
         loadImage('assets/images/12.png'),
-        loadImage('assets/images/13.png')
+        loadImage('assets/images/13.png'),
+        loadImage('assets/images/14.png'),
+        loadImage('assets/images/15.png'),
+        loadImage('assets/images/16.png'),
+        loadImage('assets/images/17.png'),
+        loadImage('assets/images/18.png'),
+        loadImage('assets/images/19.png'),
+        loadImage('assets/images/20.png'),
+        loadImage('assets/images/21.png'),
+        loadImage('assets/images/22.png'),
+        loadImage('assets/images/23.png')
+    ]
+
+    GameInfo.images.gold = loadImage('assets/images/Gold.png');
+    GameInfo.images.cardBacks = [
+        loadImage('assets/images/CommonCardBack.png'),
+        loadImage('assets/images/RareCardBack.png'),
+        loadImage('assets/images/LegCardBack.png')
     ]
     
     // Fonts
@@ -66,7 +83,7 @@ async function setup() {
     await getBoardInfo();
     setInterval(refresh, 1000);
 
-    //buttons (create a separated function if they are many)
+    // buttons (create a separated function if they are many)
     GameInfo.endturnButton = createButton('End Turn');
     GameInfo.endturnButton.parent('game');
     GameInfo.endturnButton.position(GameInfo.width - 150, GameInfo.height - 70);
@@ -84,18 +101,21 @@ async function setup() {
     GameInfo.drawCommonCard.position(GameInfo.width - 300, GameInfo.height / 2 - 300);
     GameInfo.drawCommonCard.mousePressed(drawCommonCard);
     GameInfo.drawCommonCard.addClass('game');
+    // GameInfo.drawCommonCard.gold = image(GameInfo.images.gold, 1390, 103, 20, 20);
 
     GameInfo.drawEpicCard = createButton('Draw Epic Card');
     GameInfo.drawEpicCard.parent('game');
     GameInfo.drawEpicCard.position(GameInfo.width - 300, (GameInfo.height / 2) - 250);
     GameInfo.drawEpicCard.mousePressed(drawEpicCard);
     GameInfo.drawEpicCard.addClass('game');
-
+    // GameInfo.drawEpicCard.gold = image(GameInfo.images.gold, 1340, 156, 20, 20);
+    
     GameInfo.drawLegendaryCard = createButton('Draw Legendary Card');
     GameInfo.drawLegendaryCard.parent('game');
     GameInfo.drawLegendaryCard.position(GameInfo.width - 300, (GameInfo.height / 2) - 200);
     GameInfo.drawLegendaryCard.mousePressed(drawLegendaryCard);
     GameInfo.drawLegendaryCard.addClass('game');
+    // GameInfo.drawLegendaryCard.gold = image(GameInfo.images.gold, 1405, 206, 50, 50);
 
     GameInfo.upgradeMine = createButton('Upgrade Mine');
     GameInfo.upgradeMine.parent('game');

@@ -46,10 +46,10 @@ class Card {
             image(this.img, this.dragX, this.dragY, Card.width, Card.height);
             text(this.name, this.dragX, this.dragY + 125, Card.width, Card.height * 0.25);
             textSize(19);
-            text(Card.cardType[this.type - 1], this.dragX - 25, this.dragY + 100, Card.width, 30);
+            text(Card.cardType[this.type - 1], this.dragX - 25, this.dragY + 103, Card.width, 30);
         } else {
             image(this.img, this.x, this.y, Card.width, Card.height);
-            text(this.name, this.x, this.y + 130, Card.width, Card.height * 0.25);
+            text(this.name, this.x, this.y + 125, Card.width, Card.height * 0.25);
             textSize(19);
             text(Card.cardType[this.type - 1], x - 25, y + 103, Card.width, 30);
         }
@@ -90,7 +90,7 @@ class ShieldCard extends Card {
         super.draw(x, y);
         textFont(GameInfo.fonts.CombatFont);
         textSize(Card.infoTextSize);
-
+        
         if (this.dragging) {
             text(this.hp, this.dragX + 42, this.dragY  + 65, Card.width, Card.height * 0.5);
         } else {
@@ -108,12 +108,13 @@ class SpellCard extends Card {
     
     draw(x, y) {
         super.draw(x, y);
+        textFont(GameInfo.fonts.CombatFont);
         textSize(Card.infoTextSize);
 
         if (this.dragging) {
-            text(this.attack, this.dragX, this.dragY  + (Card.height * 0.6), Card.width, Card.height * 0.4);
+            text(this.attack, this.dragX + 42, this.dragY + 65, Card.width, Card.height * 0.5);
         } else {
-            text(this.attack, x, y  + (Card.height * 0.6), Card.width, Card.height * 0.4);
+            text(this.attack, x + 42, y + 65, Card.width, Card.height * 0.5);
         }
     }
 }
@@ -147,10 +148,10 @@ class PlayerHand {
                 cards.push(new MonsterCard(cardInfo.id, cardInfo.name, cardInfo.rarity, cardInfo.type, cardInfo.state, cardInfo.position, GameInfo.images.cards[cardInfo.cardID - 1], cardInfo.hp, cardInfo.attack));
             }
             else if (cardInfo.type == 2) {
-                cards.push(new ShieldCard(cardInfo.id, cardInfo.name, cardInfo.rarity, cardInfo.type, cardInfo.state, cardInfo.position, GameInfo.images.Fireball, cardInfo.hp));
+                cards.push(new ShieldCard(cardInfo.id, cardInfo.name, cardInfo.rarity, cardInfo.type, cardInfo.state, cardInfo.position, GameInfo.images.cards[cardInfo.cardID - 1], cardInfo.hp));
             }
             else if (cardInfo.type == 3) {
-                cards.push(new SpellCard(cardInfo.id, cardInfo.name, cardInfo.rarity, cardInfo.type, cardInfo.state, cardInfo.position, GameInfo.images.Fireball, cardInfo.attack));
+                cards.push(new SpellCard(cardInfo.id, cardInfo.name, cardInfo.rarity, cardInfo.type, cardInfo.state, cardInfo.position, GameInfo.images.cards[cardInfo.cardID - 1], cardInfo.attack));
             }
         }
         return cards;
@@ -283,28 +284,31 @@ class OppCard {
         [255, 194, 91, 255] // Legendary
     ]
     
-    constructor(id, name, rarity, type, state) {
+    constructor(id, name, rarity, type, state, img) {
         this.id = id;
         this.name = name;
         this.rarity = rarity;
         this.type = type;
         this.state = state;
+        this.img = img;
     }
 
     draw(x, y) {
-        fill(
-            Card.bgColor[this.rarity - 1][0], // Red
-            Card.bgColor[this.rarity - 1][1], // Green
-            Card.bgColor[this.rarity - 1][2], // Blue
-            Card.bgColor[this.rarity - 1][3]  // Alpha
-        );
+        // fill(
+        //     Card.bgColor[this.rarity - 1][0], // Red
+        //     Card.bgColor[this.rarity - 1][1], // Green
+        //     Card.bgColor[this.rarity - 1][2], // Blue
+        //     Card.bgColor[this.rarity - 1][3]  // Alpha
+        // );
 
-        rect(
-            x,
-            y,
-            Card.width,
-            Card.height
-        );
+        // rect(
+        //     x,
+        //     y,
+        //     Card.width,
+        //     Card.height
+        // );
+
+        image(GameInfo.images.cardBacks[this.rarity - 1], x, y, 150, 200);
     }
 }
 
