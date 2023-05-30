@@ -26,12 +26,12 @@ class ScoreBoard {
 
         text("x" + this.board.player.gold, 1400, 20);
 
-        text("x4", 1370, 110);
-        text("x6", 1320, 162);
-        text("x12", 1380, 212);
+        // text("x4", 1370, 110);
+        // text("x6", 1320, 162);
+        // text("x12", 1380, 212);
 
     
-        image(GameInfo.images.gold, 1300, 50, 50, 50);
+        image(GameInfo.images.gold, 1330, 10, 50, 50);
 
         const ctx = canvas.getContext("2d");
         

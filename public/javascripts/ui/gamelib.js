@@ -42,6 +42,7 @@ function preload() {
     ]
 
     GameInfo.images.gold = loadImage('assets/images/Gold.png');
+
     GameInfo.images.cardBacks = [
         loadImage('assets/images/CommonCardBack.png'),
         loadImage('assets/images/RareCardBack.png'),
@@ -60,6 +61,7 @@ function preload() {
     GameInfo.sounds.FrontMenu = loadSound('assets/sounds/FrontMenu.mp3');
     GameInfo.sounds.BackGround = loadSound('assets/sounds/BackGround.mp3');
     GameInfo.sounds.EndGame = loadSound('assets/sounds/EndGame.mp3');
+    GameInfo.sounds.BuyUpgrade = loadSound('assets/sounds/Gold.mp3');
 }
 
 async function cancel() {
@@ -96,30 +98,30 @@ async function setup() {
     GameInfo.endButton.mousePressed(cancel);
     GameInfo.endButton.addClass('game');
 
-    GameInfo.drawCommonCard = createButton('Draw Common Card');
+    GameInfo.drawCommonCard = createButton('Draw Common Card x4 Gold');
     GameInfo.drawCommonCard.parent('game');
     GameInfo.drawCommonCard.position(GameInfo.width - 300, GameInfo.height / 2 - 300);
     GameInfo.drawCommonCard.mousePressed(drawCommonCard);
     GameInfo.drawCommonCard.addClass('game');
     // GameInfo.drawCommonCard.gold = image(GameInfo.images.gold, 1390, 103, 20, 20);
 
-    GameInfo.drawEpicCard = createButton('Draw Epic Card');
+    GameInfo.drawEpicCard = createButton('Draw Epic Card x6 Gold');
     GameInfo.drawEpicCard.parent('game');
-    GameInfo.drawEpicCard.position(GameInfo.width - 300, (GameInfo.height / 2) - 250);
+    GameInfo.drawEpicCard.position(GameInfo.width - 300, 200);
     GameInfo.drawEpicCard.mousePressed(drawEpicCard);
     GameInfo.drawEpicCard.addClass('game');
     // GameInfo.drawEpicCard.gold = image(GameInfo.images.gold, 1340, 156, 20, 20);
     
-    GameInfo.drawLegendaryCard = createButton('Draw Legendary Card');
+    GameInfo.drawLegendaryCard = createButton('Draw Legendary Card x12 Gold');
     GameInfo.drawLegendaryCard.parent('game');
-    GameInfo.drawLegendaryCard.position(GameInfo.width - 300, (GameInfo.height / 2) - 200);
+    GameInfo.drawLegendaryCard.position(GameInfo.width - 300, 270);
     GameInfo.drawLegendaryCard.mousePressed(drawLegendaryCard);
     GameInfo.drawLegendaryCard.addClass('game');
     // GameInfo.drawLegendaryCard.gold = image(GameInfo.images.gold, 1405, 206, 50, 50);
 
-    GameInfo.upgradeMine = createButton('Upgrade Mine');
+    GameInfo.upgradeMine = createButton('Upgrade Mine x5 Gold');
     GameInfo.upgradeMine.parent('game');
-    GameInfo.upgradeMine.position(GameInfo.width - 300, GameInfo.height / 2 - 100);
+    GameInfo.upgradeMine.position(GameInfo.width - 300, 400);
     GameInfo.upgradeMine.mousePressed(upgradeMine);
     GameInfo.upgradeMine.addClass('game');
     
@@ -129,7 +131,7 @@ async function setup() {
 }
 
 function draw() {
-    background("#996633");
+    background("#5F3127");
     if (!GameInfo.sounds.BackGround.isPlaying()) {
         GameInfo.sounds.BackGround.play();
     }

@@ -111,6 +111,7 @@ async function upgradeMineAction() {
         await getGameInfo();
         await getBoardInfo();
         GameInfo.prepareUI();
+        GameInfo.sounds.BuyUpgrade.play();
     } else alert("Something went wrong when upgrading the mine.");
 }
 

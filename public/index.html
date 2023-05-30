@@ -7,12 +7,16 @@
   <script src="./javascripts/requests/matchesRequests.js"></script>
   <script src="./javascripts/requests/usersRequests.js"></script>
   <script src="./javascripts/login.js"></script>
+  <style type="text/css">    </style>
 </head>
 
 <body>
   <header>
-    <h1>Login</h1>
+    <h1></h1>
   </header>
+  <div id="headers">
+  <h1 id="mainPageWelcome">Welcome to Mystic & Cards</h1>
+  <h3 id="mainPageInformation">Want to play? Create an account to get started!</h3>
   <main>
     <p> If you have a match running you will enter that match.
       Otherwise it will go to the match making page.
@@ -20,20 +24,27 @@
     <form action="javascript:login()">
       <table>
         <tr>
-          <td>Name:</td>
-          <td><input type="text" autocomplete="username" id="name"></td>
+            <div id="UsernameMain">
+                <label>Username: </label>
+            <input type="text" placeholder="name" id="name" name="name">
         </tr>
         <tr>
-          <td>Password:</td>
-          <td><input type="password" autocomplete="current-password" id="password"></td>
+            <div id="PasswordMain">
+                <label>Password: </label>
+                <input type="password" placeholder="password" id="password" name="password">
         </tr>
+        <div id="logsRegsBtns">
+        </button>
       </table>
       <p id="msg" class="warning"></p>
+      <div id="logsRegsBtns">
+        </button>
       <p><input type="submit" value="Login"></p>
       <p><a href="register.html">Create a new account</a></p>
       <p><a href="scoreboard.html">See previous games Score Board</a></p>
     </form>
   </main>
 </body>
+<p> <script>document.write(new Date().getFullYear());</script> Rodrigo Alves & Sofia Leite & Alexandre Constâncio</p>
 
 </html>

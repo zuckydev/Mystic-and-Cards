@@ -136,6 +136,11 @@ class Play {
         where ug_game_id = ? and ug_user_id = ?`,
             [gameId, userId]);
 
+        [playerInfo.mine] = await pool.query(`
+            Select ug_mine_level_cost as "mineCost" 
+            from user_game where ug_id = ? and ug_game_id = ?`, 
+                [userId, gameId]);
+
         [playerInfo.hand] = await pool.query(
             `Select
             ugc_id as "id",

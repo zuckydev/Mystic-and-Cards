@@ -47,7 +47,7 @@ class Mine {
                     [playerGold.gold, game.player.id]);
 
                 await pool.query(
-                    `update user_game
+                    `Update user_game
                     set ug_mine_level = ug_mine_level + 1
                     where ug_id = ?`,
                     [game.player.id]
